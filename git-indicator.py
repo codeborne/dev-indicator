@@ -37,7 +37,7 @@ if __name__ == "__main__":
     current_name = Popen(["git", "config", "--global", "user.name"], stdout=PIPE).communicate()[0]
     current_name = current_name.strip()
 
-    ind = appindicator.Indicator ("example-simple-client", "indicator-git", appindicator.CATEGORY_OTHER)
+    ind = appindicator.Indicator ("git-indicator", "krb-valid-ticket", appindicator.CATEGORY_OTHER)
     ind.set_status (appindicator.STATUS_ACTIVE)
     ind.set_label(current_name)
 
