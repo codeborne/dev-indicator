@@ -1,33 +1,47 @@
-import gobject
+# -*- coding: utf-8 -*-
+from subprocess import Popen, PIPE
+
 import gtk
 import appindicator
 
+def add_name(menu, name):
+    menu_item = gtk.MenuItem(name)
+    menu.append(menu_item)
+    menu_item.connect("activate", name_selected)
+    menu_item.show()
 
-def menuitem_response(w, buf):
- print buf
-
-def new_developer(menu, name):
- menu_items = gtk.MenuItem(name)
- menu.append(menu_items)
- menu_items.show()
+def name_selected(widget):
+    name = widget.get_label()
+    ind.set_label(name)
 
 if __name__ == "__main__":
- ind = appindicator.Indicator ("example-simple-client",
-                             "indicator-messages",
-                             appindicator.CATEGORY_OTHER)
- ind.set_status (appindicator.STATUS_ACTIVE)
- #ind.set_attention_icon ("indicator-messages-new")
- ind.set_label("Anton Keks")
+    current_name = Popen(["git", "config", "--global", "user.name"], stdout=PIPE).communicate()[0]
+    current_name = current_name.strip()
 
- # create a menu
- menu = gtk.Menu()
+    ind = appindicator.Indicator ("example-simple-client", "indicator-git", appindicator.CATEGORY_OTHER)
+    ind.set_status (appindicator.STATUS_ACTIVE)
+    #ind.set_attention_icon ("indicator-messages-new")
+    ind.set_label(current_name)
 
- # create some
- new_developer(menu, "Anton Keks")
- new_developer(menu, "Erik Jogi")
- new_developer(menu, "Revo Sirel")
- new_developer(menu, "Aivar Naaber")
+    menu = gtk.Menu()
 
- ind.set_menu(menu)
+    names = [
+         "Aho Augasmägi",
+         "Aivar Naaber",
+         "Alvar Lumberg",
+         "Andrei Solntsev",
+         "Anton Keks",
+         "Erik Jõgi",
+         "Jarmo Pertman",
+         "Marek Kusmin",
+         "Revo Sirel",
+         "Tarmo Ojala",
+         "Vadim Gerassimov"
+    ]
 
- gtk.main()
+    for name in names:
+        add_name(menu, name)
+
+    ind.set_menu(menu)
+
+    gtk.main()
