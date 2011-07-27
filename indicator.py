@@ -13,6 +13,7 @@ names = [
      "Andrei Solntsev",
      "Anton Keks",
      "Erik Jõgi",
+     "Jaan Sepp",
      "Jarmo Pertman",
      "Marek Kusmin",
      "Revo Sirel",
