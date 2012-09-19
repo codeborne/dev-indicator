@@ -13,15 +13,16 @@ names = [
      "Andrei Solntsev",
      "Anton Keks",
      "Erik Jõgi",
+     "Filipp Keks",
      "Jaan Sepp",
      "Jarmo Pertman",
+     "Kirill Klenski",
+     "Maksim Säkki",
      "Marek Kusmin",
+     "Patrick Abner"
      "Revo Sirel",
      "Tarmo Ojala",
-     "Vadim Gerassimov",
-     "Patrick Abner",
-     "Jaan Sepp",
-     "Kirill Klenski"
+     "Vadim Gerassimov"
 ]
 
 def add_name(menu, name):
