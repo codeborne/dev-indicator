@@ -19,7 +19,7 @@ names = [
      "Kirill Klenski",
      "Maksim Säkki",
      "Marek Kusmin",
-     "Patrick Abner"
+     "Patrick Abner",
      "Revo Sirel",
      "Tarmo Ojala",
      "Vadim Gerassimov"
