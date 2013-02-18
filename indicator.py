@@ -13,7 +13,8 @@ names = [
      "Andrei Solntsev",
      "Anton Keks",
      "Erik Jõgi",
-     "Filipp Keks",
+     "Erkki Teedla",
+     "Ingmar Oja",
      "Jaan Sepp",
      "Jarmo Pertman",
      "Kirill Klenski",
@@ -21,6 +22,7 @@ names = [
      "Marek Kusmin",
      "Patrick Abner",
      "Revo Sirel",
+     "Tanel Tamm",
      "Tarmo Ojala",
      "Vadim Gerassimov"
 ]
