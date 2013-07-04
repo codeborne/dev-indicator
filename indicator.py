@@ -10,7 +10,6 @@ import appindicator
 names = [
      "Aho Augasmägi",
      "Aivar Naaber",
-     "Alvar Lumberg",
      "Andrei Solntsev",
      "Anton Keks",
      "Erik Jõgi",
@@ -20,6 +19,7 @@ names = [
      "Jarmo Pertman",
      "Kirill Klenski",
      "Kunnar Klauks",
+     "Kristjan Kokk",
      "Maksim Säkki",
      "Marko Randrüüt",
      "Marek Kusmin",
