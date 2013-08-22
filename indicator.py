@@ -27,7 +27,12 @@ names = [
      "Revo Sirel",
      "Tanel Tamm",
      "Tarmo Ojala",
-     "Vadim Gerassimov"
+     "Vadim Gerassimov",
+     "Elina Matvejeva",
+     "Annika Tammik",
+     "Aivo Vikat",
+     "Priidu Kull",
+     "Martin Beldman"
 ]
 
 def add_name(menu, name):
