@@ -32,7 +32,8 @@ names = [
      "Annika Tammik",
      "Aivo Vikat",
      "Priidu Kull",
-     "Martin Beldman"
+     "Martin Beldman",
+     "Karl Kesküla"
 ]
 
 def add_name(menu, name):
