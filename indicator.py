@@ -36,11 +36,13 @@ names = [
      "Karl Kesküla"
 ]
 
+
 def add_name(menu, name):
     menu_item = gtk.MenuItem(name)
     menu.append(menu_item)
     menu_item.connect("activate", name_selected)
     menu_item.show()
+
 
 def name_selected(widget):
     name = widget.get_label()
@@ -53,8 +55,8 @@ if __name__ == "__main__":
     current_name = Popen(["git", "config", "--global", "user.name"], stdout=PIPE).communicate()[0]
     current_name = current_name.strip()
 
-    ind = appindicator.Indicator ("git-indicator", "krb-valid-ticket", appindicator.CATEGORY_OTHER)
-    ind.set_status (appindicator.STATUS_ACTIVE)
+    ind = appindicator.Indicator("git-indicator", "krb-valid-ticket", appindicator.CATEGORY_OTHER)
+    ind.set_status(appindicator.STATUS_ACTIVE)
     ind.set_label(current_name)
 
     menu = gtk.Menu()
@@ -63,5 +65,8 @@ if __name__ == "__main__":
         add_name(menu, name)
 
     ind.set_menu(menu)
+
+    # from jenkins_desktop_notify import run_jenkins_notifier
+    # Timer(1, run_jenkins_notifier).start()
 
     gtk.main()
