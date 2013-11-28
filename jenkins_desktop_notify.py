@@ -19,6 +19,10 @@ def get_jobs(jenkins_url):
         }
 
     jobs = ask(jenkins_url)
+    print "get_jobs: %s" % jobs
+    print
+    print
+
     return imap(make_job, jobs.get('jobs'))
 
 
@@ -30,6 +34,9 @@ def jobs_running_info(jobs):
 
 def running(job):
     status = get_job_status(job)
+    print "get_job_status for %s: %s" % (job, status)
+    print
+    print
 
     build = get_last_build(status)
     if build:
@@ -45,6 +52,8 @@ def _make_secure_url(url):
 
 
 def get_job_status(job):
+    # TODO Use faster URL: https://jenkins.codeborne.com/job/ibank/lastBuild/api/json?pretty=true
+
     # Current upstream jenkins have bug
     # https://issues.jenkins-ci.org/browse/JENKINS-15713
     # so, running builds can only be acquired with this ugly workarounc
@@ -73,6 +82,10 @@ def get_last_build(job_status):
 def ask(url):
     try:
         secure_url = _make_secure_url(url)
+        print "ask %s" % secure_url
+        print
+        print
+
         json_response = urlopen(urljoin(secure_url, 'api/json')).read()
     except Exception as e:
         print "Ignoring invalid job info at url %s, caused by: %s" % (url, e)
@@ -97,6 +110,10 @@ def report_required(old_job_status, new_job_status, old_status_info):
 def run_jenkins_notifier():
     old_status_info = {}
     while True:
+        print "Check jenkins status"
+        print
+        print
+
         jobs = get_jobs(jenkins_url)  # there may be new jobs
         new_status_info = jobs_running_info(jobs)
 
@@ -109,10 +126,13 @@ def run_jenkins_notifier():
                 error_message = '%s<br>Job %s %s' % (error_message, name, new_job_status)
 
         if error_message:
+            print "Error found: %s" % error_message
             notify(error_message)
+        else:
+            print "No errors found"
 
         old_status_info = new_status_info
-        sleep(60*3)
+        sleep(5)
 
 
 if __name__ == '__main__':
