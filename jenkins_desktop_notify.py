@@ -1,7 +1,9 @@
 #!/usr/bin/env python
+# coding=utf-8
+import base64
 from json import loads
 import os
-from urllib import urlopen
+import urllib2
 from urlparse import urljoin
 from itertools import imap
 from subprocess import Popen
@@ -18,7 +20,7 @@ def get_jobs(jenkins_url):
             'name': job.get('name')
         }
 
-    jobs = ask(jenkins_url)
+    jobs = ask(urljoin(jenkins_url, 'api/json?pretty=true'))
     print "get_jobs: %s" % jobs
     print
     print
@@ -40,7 +42,7 @@ def running(job):
 
     build = get_last_build(status)
     if build:
-        build_info = ask(build.get('url'))
+        build_info = ask(urljoin(build.get('url'), 'api/json?pretty=true'))
         if build_info.get('building'):
             return "RUNNING"
         return build_info.get('result')
@@ -58,12 +60,11 @@ def get_job_status(job):
     # https://issues.jenkins-ci.org/browse/JENKINS-15713
     # so, running builds can only be acquired with this ugly workarounc
     try:
-        url = urljoin(_make_secure_url(job.get('url')), 'api/json')
-        url += '?tree=allBuilds[name,url,result,building,number]'
-        r = urlopen(url).read()
-        return {'builds': loads(r)['allBuilds']}
-    except ValueError:
-        print "Ignoring invalid job status info at url %s" % job.get('url')
+        url = urljoin(job.get('url'), 'api/json', '?tree=allBuilds[name,url,result,building,number]&pretty=true')
+        json = ask(url)
+        return {'builds': json['builds']}
+    except ValueError as e:
+        print "Ignoring invalid job status info at url %s, cause by: %s, json: %s" % (job.get('url'), e, json)
     return {}
 
 
@@ -80,21 +81,26 @@ def get_last_build(job_status):
 
 
 def ask(url):
-    try:
-        secure_url = _make_secure_url(url)
-        print "ask %s" % secure_url
-        print
-        print
+    secure_url = _make_secure_url(url)
+    print "ask %s" % secure_url
+    print
+    print
 
-        json_response = urlopen(urljoin(secure_url, 'api/json')).read()
+    request = urllib2.Request(secure_url)
+    temp = 'jenkins_viewer:Сколько у государства не воруй — все равно своего не вернешь!'
+    base64string = base64.encodestring(temp).replace('\n', '')
+    request.add_header("Authorization", u"Basic %s" % base64string)
+
+    try:
+        json_response = urllib2.urlopen(request).read()
     except Exception as e:
-        print "Ignoring invalid job info at url %s, caused by: %s" % (url, e)
+        print "Ignoring invalid response from url %s, caused by: %s" % (url, e)
         return {}
 
     try:
         return loads(json_response)
     except ValueError as e:
-        print "Ignoring invalid job info at url %s, caused by: %s, json: %s" % (url, e, json_response)
+        print u"Ignoring invalid response from url %s, caused by: %s, json: %s" % (url, e, json_response)
         return {}
 
 
@@ -122,7 +128,7 @@ def run_jenkins_notifier():
             old_job_status = old_status_info.get(name)
             if report_required(old_job_status, new_job_status, old_status_info):
                 error_message = '%s<br>Job %s %s -> %s' % (error_message, name, old_job_status, new_job_status)
-            elif new_job_status != 'SUCCESS':
+            elif new_job_status not in ('SUCCESS', 'RUNNING'):
                 error_message = '%s<br>Job %s %s' % (error_message, name, new_job_status)
 
         if error_message:
