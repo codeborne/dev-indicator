@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 import base64
+from datetime import datetime
 from json import loads
 import os
 import urllib2
@@ -11,6 +12,8 @@ import string
 from time import sleep
 
 jenkins_url = 'https://jenkins.codeborne.com:444/view/All/'
+pause = 60*3
+excludes = []
 
 
 def get_jobs(jenkins_url):
@@ -21,32 +24,13 @@ def get_jobs(jenkins_url):
         }
 
     jobs = ask(urljoin(jenkins_url, 'api/json?pretty=true'))
-    print "get_jobs: %s" % jobs
-    print
-    print
-
-    return imap(make_job, jobs.get('jobs'))
+    return imap(make_job, jobs.get('jobs')) if 'jobs' in jobs else []
 
 
 def jobs_running_info(jobs):
     def make_job(job):
-        return job.get('name'), running(job)
+        return job.get('name'), get_job_status(job)
     return dict(make_job(job) for job in jobs)
-
-
-def running(job):
-    status = get_job_status(job)
-    print "get_job_status for %s: %s" % (job, status)
-    print
-    print
-
-    build = get_last_build(status)
-    if build:
-        build_info = ask(urljoin(build.get('url'), 'api/json?pretty=true'))
-        if build_info.get('building'):
-            return "RUNNING"
-        return build_info.get('result')
-    return "UNKNOWN"
 
 
 def _make_secure_url(url):
@@ -54,38 +38,24 @@ def _make_secure_url(url):
 
 
 def get_job_status(job):
-    # TODO Use faster URL: https://jenkins.codeborne.com/job/ibank/lastBuild/api/json?pretty=true
-
-    # Current upstream jenkins have bug
-    # https://issues.jenkins-ci.org/browse/JENKINS-15713
-    # so, running builds can only be acquired with this ugly workarounc
+    url = urljoin(job.get('url'), 'lastBuild/api/json?pretty=true')
     try:
-        url = urljoin(job.get('url'), 'api/json', '?tree=allBuilds[name,url,result,building,number]&pretty=true')
         json = ask(url)
-        return {'builds': json['builds']}
+        if json['building']:
+            return {'status': 'RUNNING',
+                    'name': json['fullDisplayName'],
+                    'duration': '%d%%' % (json['duration']/json['estimatedDuration']*100) if json['duration'] else '',
+                    'cause': json['actions'][0]['causes'][0]['shortDescription']}
+        else:
+            return {'status': json['result'],
+                    'name': json['fullDisplayName']}
     except ValueError as e:
-        print "Ignoring invalid job status info at url %s, cause by: %s, json: %s" % (job.get('url'), e, json)
-    return {}
-
-
-def get_last_build(job_status):
-    def compare(job1, job2):
-        return job1.get('number') < job2.get('number')
-
-    builds = job_status.get('builds')
-    if builds is not None and len(builds) > 0:
-        builds.sort(cmp=compare)
-        return builds[0]
-    else:
-        return None
+        return {'status': 'FAILURE',
+                'name': '%s: %s' % (job, e)}
 
 
 def ask(url):
     secure_url = _make_secure_url(url)
-    print "ask %s" % secure_url
-    print
-    print
-
     request = urllib2.Request(secure_url)
     temp = 'jenkins_viewer:Сколько у государства не воруй — все равно своего не вернешь!'
     base64string = base64.encodestring(temp).replace('\n', '')
@@ -94,51 +64,74 @@ def ask(url):
     try:
         json_response = urllib2.urlopen(request).read()
     except Exception as e:
-        print "Ignoring invalid response from url %s, caused by: %s" % (url, e)
+        print "Ignoring invalid response from url %s, caused by: %s" % (secure_url, e)
+        notify('Jenkins is unavailable', '%s' % e)
         return {}
 
     try:
         return loads(json_response)
     except ValueError as e:
-        print u"Ignoring invalid response from url %s, caused by: %s, json: %s" % (url, e, json_response)
+        print u"Ignoring invalid response from url %s, caused by: %s, json: %s" % (secure_url, e, json_response)
+        notify('Jenkins is inadequate', '%s' % e)
         return {}
 
 
-def notify(message):
-    icon = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'angry-jenkins.png')
-    Popen(['notify-send', 'Jenkins on fire!', message, '-i', icon])
+def notify(subject, message, icon='jenkins-alarm.png'):
+    icon = os.path.join(os.path.dirname(os.path.realpath(__file__)), icon)
+    Popen(['notify-send', subject, message, '-i', icon])
 
 
-def report_required(old_job_status, new_job_status, old_status_info):
-    return old_status_info and old_job_status != new_job_status
+def status_changed(old_job_status, new_job_status, old_status_info):
+    return old_status_info and old_job_status['status'] != new_job_status['status']
 
 
 def run_jenkins_notifier():
+    current_status = None
     old_status_info = {}
     while True:
-        print "Check jenkins status"
         print
-        print
+        print "%s Check jenkins status" % datetime.now()
 
-        jobs = get_jobs(jenkins_url)  # there may be new jobs
+        jobs = get_jobs(jenkins_url)
+        if not jobs:
+            sleep(pause)
+            continue
+
         new_status_info = jobs_running_info(jobs)
 
         error_message = ''
+        info_message = ''
         for name, new_job_status in new_status_info.iteritems():
             old_job_status = old_status_info.get(name)
-            if report_required(old_job_status, new_job_status, old_status_info):
-                error_message = '%s<br>Job %s %s -> %s' % (error_message, name, old_job_status, new_job_status)
-            elif new_job_status not in ('SUCCESS', 'RUNNING'):
-                error_message = '%s<br>Job %s %s' % (error_message, name, new_job_status)
+            if name in excludes:
+                pass
+            elif new_job_status['status'] == 'RUNNING':
+                info_message = '%s<br>%s %s %s<br>  %s<br>' % (info_message,
+                                                               new_job_status['name'],
+                                                               new_job_status['status'],
+                                                               new_job_status['duration'],
+                                                               new_job_status['cause'])
+            elif new_job_status['status'] != 'SUCCESS':
+                error_message = '%s<br>%s %s' % (error_message, new_job_status['name'], new_job_status['status'])
+            elif status_changed(old_job_status, new_job_status, old_status_info):
+                info_message = '%s<br>%s %s -> %s' % (info_message,
+                                                      new_job_status['name'],
+                                                      old_job_status['status'],
+                                                      new_job_status['status'])
 
         if error_message:
-            print "Error found: %s" % error_message
-            notify(error_message)
+            current_status = 'ERROR'
+            print "Errors found: %s" % error_message
+            msg = '%s <br>__________<br> %s' % (error_message, info_message) if info_message else error_message
+            notify('Jenkins on fire!', msg)
         else:
-            print "No errors found"
+            if current_status != 'SUCCESS':
+                print "No errors found"
+                notify('Jenkins is ok!', info_message, 'jenkins-ok.gif')
+            current_status = 'SUCCESS'
 
         old_status_info = new_status_info
-        sleep(5)
+        sleep(pause)
 
 
 if __name__ == '__main__':
