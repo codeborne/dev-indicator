@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 from json import loads
 import os
-from threading import Timer
 from urllib import urlopen
 from urlparse import urljoin
 from itertools import imap
 from subprocess import Popen
 import string
+from time import sleep
 
 jenkins_url = 'https://jenkins.codeborne.com:444/view/All/'
 
@@ -87,7 +87,7 @@ def ask(url):
 
 def notify(message):
     icon = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'angry-jenkins.png')
-    Popen(['notify-send', 'Jenkins in trouble!', message, '-i', icon])
+    Popen(['notify-send', 'Jenkins on fire!', message, '-i', icon])
 
 
 def report_required(old_job_status, new_job_status, old_status_info):
@@ -112,7 +112,7 @@ def run_jenkins_notifier():
             notify(error_message)
 
         old_status_info = new_status_info
-        Timer(60*5, run_jenkins_notifier).start()
+        sleep(60*3)
 
 
 if __name__ == '__main__':
