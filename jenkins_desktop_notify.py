@@ -112,7 +112,7 @@ def run_jenkins_notifier():
             notify(error_message)
 
         old_status_info = new_status_info
-        Timer(15, run_jenkins_notifier).start()
+        Timer(60*5, run_jenkins_notifier).start()
 
 
 if __name__ == '__main__':
