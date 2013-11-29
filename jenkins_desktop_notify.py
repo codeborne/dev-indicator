@@ -123,7 +123,7 @@ def run_jenkins_notifier():
             current_status = 'ERROR'
             print "Errors found: %s" % error_message
             msg = '%s <br>__________<br> %s' % (error_message, info_message) if info_message else error_message
-            notify('At least one job failed to build!', msg)
+            notify('Build failed!', msg)
         else:
             if current_status != 'SUCCESS':
                 print "No errors found"
