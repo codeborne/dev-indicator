@@ -43,7 +43,17 @@ def get_scm_changes(job_status):
     elif 'items' not in job_status['changeSet']:
         return ''
 
-    return string.join(['%s - %s' % (change['author']['fullName'], change['msg']) for change in job_status['changeSet']['items']], "<br>")
+    return string.join(['  %s - %s' % (change['author']['fullName'], change['msg']) for change in job_status['changeSet']['items']], "<br>")
+
+
+def get_scm_authors(job_status):
+    if 'changeSet' not in job_status:
+        return ''
+    elif 'items' not in job_status['changeSet']:
+        return ''
+
+    authors = string.join([change['author']['fullName'] for change in job_status['changeSet']['items']], ", ")
+    return u'[%s]' % authors if authors else ''
 
 
 def get_job_status(job):
@@ -56,7 +66,9 @@ def get_job_status(job):
             return {'status': 'RUNNING',
                     'name': json['fullDisplayName'],
                     'duration': '%d%%' % (json['duration']/json['estimatedDuration']*100) if json['duration'] else '',
-                    'cause': json['actions'][0]['causes'][0]['shortDescription']}
+                    # 'cause': json['actions'][0]['causes'][0]['shortDescription'] + get_scm_changes(json)
+                    'cause': get_scm_authors(json)
+            }
         else:
             return {'status': json['result'],
                     'name': json['fullDisplayName']}
@@ -118,11 +130,11 @@ def run_jenkins_notifier():
             if name in excludes:
                 pass
             elif new_job_status['status'] == 'RUNNING':
-                working_message = '%s<br>%s %s %s<br>  %s<br>' % (working_message,
-                                                                  new_job_status['name'],
-                                                                  new_job_status['status'],
-                                                                  new_job_status['duration'],
-                                                                  new_job_status['cause'])
+                working_message = '%s<br>%s %s %s  %s<br>' % (working_message,
+                                                              new_job_status['name'],
+                                                              new_job_status['status'],
+                                                              new_job_status['duration'],
+                                                              new_job_status['cause'])
             elif new_job_status['status'] != 'SUCCESS':
                 error_message = '%s<br>%s %s' % (error_message, new_job_status['name'], new_job_status['status'])
             elif status_changed(old_job_status, new_job_status, old_status_info):
