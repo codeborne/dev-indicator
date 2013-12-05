@@ -4,6 +4,7 @@ import base64
 from datetime import datetime
 from json import loads
 import os
+os.environ['http_proxy']=''
 import urllib2
 from urlparse import urljoin
 from itertools import imap
@@ -12,7 +13,7 @@ import string
 from time import sleep
 
 jenkins_url = 'https://jenkins.codeborne.com:444/view/All/'
-pause = 60*2
+pause = 10
 excludes = []
 
 
