@@ -4,7 +4,7 @@ import base64
 from datetime import datetime
 from json import loads
 import os
-os.environ['http_proxy']=''
+os.environ['http_proxy'] = ''
 import urllib2
 from urlparse import urljoin
 from itertools import imap
@@ -13,7 +13,7 @@ import string
 from time import sleep
 
 jenkins_url = 'https://jenkins.codeborne.com:444/view/All/'
-pause = 10
+pause = 60
 excludes = []
 
 
@@ -53,8 +53,8 @@ def get_scm_authors(job_status):
     elif 'items' not in job_status['changeSet']:
         return ''
 
-    authors = string.join([change['author']['fullName'] for change in job_status['changeSet']['items']], ", ")
-    return u'[%s]' % authors if authors else ''
+    authors = [change['author']['fullName'] for change in job_status['changeSet']['items']]
+    return u'[%s]' % string.join(set(authors), ", ") if authors else ''
 
 
 def get_job_status(job):
