@@ -6,6 +6,8 @@ from subprocess import Popen, PIPE
 
 import gtk
 import appindicator
+from threading import Timer, Thread
+import time
 
 names = [
      "Aho Augasmägi",
@@ -51,6 +53,13 @@ def name_selected(widget):
     os.system("git config --global user.email '" + email + "'")
     ind.set_label(name)
 
+
+class UserReset(Thread):
+    def run(self):
+        while True:
+            print "RESET user"
+            time.sleep(10)
+
 if __name__ == "__main__":
     current_name = Popen(["git", "config", "--global", "user.name"], stdout=PIPE).communicate()[0]
     current_name = current_name.strip()
@@ -66,7 +75,12 @@ if __name__ == "__main__":
 
     ind.set_menu(menu)
 
-    # from jenkins_desktop_notify import run_jenkins_notifier
-    # Timer(1, run_jenkins_notifier).start()
+    from jenkins_desktop_notify import run_jenkins_notifier
+    Timer(1, run_jenkins_notifier).start()
 
+    UserReset().start()
+
+    gtk.threads_init()
+    gtk.threads_enter()
     gtk.main()
+    gtk.threads_leave()
