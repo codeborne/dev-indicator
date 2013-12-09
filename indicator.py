@@ -32,10 +32,10 @@ names = [
      "Vadim Gerassimov",
      "Elina Matvejeva",
      "Annika Tammik",
-     "Aivo Vikat",
-     "Priidu Kull",
-     "Martin Beldman",
-     "Karl Kesküla"
+#     "Aivo Vikat",
+#     "Priidu Kull",
+     "Martin Beldman"
+#     "Karl Kesküla"
 ]
 
 
