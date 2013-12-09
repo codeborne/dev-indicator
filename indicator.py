@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+from datetime import datetime
 import os
 import re
 from subprocess import Popen, PIPE
@@ -55,10 +56,18 @@ def name_selected(widget):
 
 
 class UserReset(Thread):
+    def reset_user_at_midnight(self):
+        hour = datetime.now().hour
+        if hour == 0:
+            print "Reset git user at midnight %s" % datetime.now()
+            os.system("git config --global user.name ''")
+            os.system("git config --global user.email ''")
+            ind.set_label('')
+
     def run(self):
         while True:
-            print "RESET user"
-            time.sleep(20)
+            self.reset_user_at_midnight()
+            time.sleep(60*55)
 
 if __name__ == "__main__":
     current_name = Popen(["git", "config", "--global", "user.name"], stdout=PIPE).communicate()[0]
@@ -76,7 +85,7 @@ if __name__ == "__main__":
     ind.set_menu(menu)
 
     from jenkins_desktop_notify import run_jenkins_notifier
-    Timer(1, run_jenkins_notifier).start()
+    Timer(5, run_jenkins_notifier).start()
 
     UserReset().start()
 
