@@ -58,7 +58,7 @@ class UserReset(Thread):
     def run(self):
         while True:
             print "RESET user"
-            time.sleep(10)
+            time.sleep(20)
 
 if __name__ == "__main__":
     current_name = Popen(["git", "config", "--global", "user.name"], stdout=PIPE).communicate()[0]
