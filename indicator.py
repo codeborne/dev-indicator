@@ -60,8 +60,8 @@ class UserReset(Thread):
         hour = datetime.now().hour
         if hour == 0:
             print "Reset git user at midnight %s" % datetime.now()
-            os.system("git config --global user.name ''")
-            os.system("git config --global user.email ''")
+            os.system("git config --global --unset user.name")
+            os.system("git config --global --unset user.email")
             ind.set_label('')
 
     def run(self):
