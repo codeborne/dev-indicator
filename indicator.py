@@ -40,7 +40,7 @@ names = [
 
 
 def add_name(menu, name):
-    menu_item = gtk.MenuItem(name)
+    menu_item = gtk.CheckMenuItem(name)
     menu.append(menu_item)
     menu_item.connect("activate", name_selected)
     menu_item.show()
