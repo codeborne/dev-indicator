@@ -9,6 +9,7 @@ import gtk
 import appindicator
 from threading import Timer, Thread
 import time
+import sys
 
 is_alive = True
 selected_names = []
@@ -41,16 +42,37 @@ names = [
 
 def add_name(menu, name):
     menu_item = gtk.CheckMenuItem(name)
+    if is_selected(name):
+        menu_item.set_active(True)
+
     menu.append(menu_item)
     menu_item.connect("activate", name_selected)
     menu_item.show()
+
+
+def quit_program(widget):
+    gtk.threads_leave()
+    gtk.main_quit()
+    sys.exit(0)
+
+
+def add_action(menu, text, handler):
+    menu_item = gtk.MenuItem(text)
+    menu.append(menu_item)
+    menu_item.connect("activate", handler)
+    menu_item.show()
+
+
+def is_selected(name):
+    global selected_names
+    return name in selected_names
 
 
 def name_selected(widget):
     name = widget.get_label()
 
     global selected_names
-    if name in selected_names:
+    if is_selected(name):
         selected_names.remove(name)
     else:
         selected_names.append(name)
@@ -95,17 +117,19 @@ def run_jenkins_notifier():
 
 
 if __name__ == "__main__":
-    current_name = Popen(["git", "config", "--global", "user.name"], stdout=PIPE).communicate()[0]
-    current_name = current_name.strip()
+    current_git_username = Popen(["git", "config", "--global", "user.name"], stdout=PIPE).communicate()[0]
+    current_git_username = current_git_username.strip()
+    selected_names = filter(None, [name.strip() for name in current_git_username.split(",")])
 
     ind = appindicator.Indicator("git-indicator", "krb-valid-ticket", appindicator.CATEGORY_OTHER)
     ind.set_status(appindicator.STATUS_ACTIVE)
-    ind.set_label(current_name)
+    ind.set_label(current_git_username)
 
     menu = gtk.Menu()
 
     for name in names:
         add_name(menu, name)
+    # add_action(menu, 'exit', quit_program)
 
     ind.set_menu(menu)
 
