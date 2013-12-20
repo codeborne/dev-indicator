@@ -10,33 +10,32 @@ import appindicator
 from threading import Timer, Thread
 import time
 
+is_alive = True
+selected_names = []
+
 names = [
-     "Aho Augasmägi",
-     "Aivar Naaber",
-     "Andrei Solntsev",
-     "Anton Keks",
-     "Erik Jõgi",
-     "Erkki Teedla",
-     "Ingmar Oja",
-     "Jaan Sepp",
-     "Jarmo Pertman",
-     "Kirill Klenski",
-     "Kunnar Klauks",
-     "Kristjan Kokk",
-     "Maksim Säkki",
-     "Marko Randrüüt",
-     "Marek Kusmin",
-     "Patrick Abner",
-     "Revo Sirel",
-     "Tanel Tamm",
-     "Tarmo Ojala",
-     "Vadim Gerassimov",
-     "Elina Matvejeva",
-     "Annika Tammik",
-#     "Aivo Vikat",
-#     "Priidu Kull",
-     "Martin Beldman"
-#     "Karl Kesküla"
+    "Aho Augasmägi",
+    "Aivar Naaber",
+    "Andrei Solntsev",
+    "Anton Keks",
+    "Erik Jõgi",
+    "Erkki Teedla",
+    "Jaan Sepp",
+    "Jarmo Pertman",
+    "Kirill Klenski",
+    "Kunnar Klauks",
+    "Kristjan Kokk",
+    "Maksim Säkki",
+    "Marko Randrüüt",
+    "Marek Kusmin",
+    "Patrick Abner",
+    "Revo Sirel",
+    "Tanel Tamm",
+    "Tarmo Ojala",
+    "Vadim Gerassimov",
+    "Elina Matvejeva",
+    "Annika Tammik",
+    "Martin Beldman"
 ]
 
 
@@ -49,10 +48,28 @@ def add_name(menu, name):
 
 def name_selected(widget):
     name = widget.get_label()
-    os.system("git config --global user.name '" + name + "'")
-    email = re.sub(r" .*$", "@codeborne.com", name.lower())
-    os.system("git config --global user.email '" + email + "'")
-    ind.set_label(name)
+
+    global selected_names
+    if name in selected_names:
+        selected_names.remove(name)
+    else:
+        selected_names.append(name)
+
+    selected_emails = [re.sub(r" .*$", "@codeborne.com", name.lower()) for name in selected_names]
+
+    git_username = ", ".join(selected_names)
+    git_email = ", ".join(selected_emails)
+
+    reset_git_username()
+    os.system(u"git config --global user.name '%s'" % git_username)
+    os.system(u"git config --global user.email '%s'" % git_email)
+    ind.set_label(git_username)
+
+
+def reset_git_username():
+    os.system("git config --global --unset user.name")
+    os.system("git config --global --unset user.email")
+    ind.set_label('')
 
 
 class UserReset(Thread):
@@ -60,14 +77,22 @@ class UserReset(Thread):
         hour = datetime.now().hour
         if hour == 0:
             print "Reset git user at midnight %s" % datetime.now()
-            os.system("git config --global --unset user.name")
-            os.system("git config --global --unset user.email")
-            ind.set_label('')
+            reset_git_username()
 
     def run(self):
         while True:
             self.reset_user_at_midnight()
             time.sleep(60*55)
+
+
+def run_jenkins_notifier():
+    from jenkins_desktop_notify import JenkinsChecker
+    jenkins_checker = JenkinsChecker()
+    global is_alive
+    while is_alive:
+        jenkins_checker.check_jobs()
+        jenkins_checker.sleep()
+
 
 if __name__ == "__main__":
     current_name = Popen(["git", "config", "--global", "user.name"], stdout=PIPE).communicate()[0]
@@ -84,7 +109,6 @@ if __name__ == "__main__":
 
     ind.set_menu(menu)
 
-    from jenkins_desktop_notify import run_jenkins_notifier
     Timer(5, run_jenkins_notifier).start()
 
     UserReset().start()

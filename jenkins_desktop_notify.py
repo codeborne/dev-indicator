@@ -105,21 +105,23 @@ def notify(subject, message, icon='jenkins-alarm.png'):
     Popen(['notify-send', subject, message, '-i', icon])
 
 
-def status_changed(old_job_status, new_job_status, old_status_info):
-    return 'status' in old_status_info and old_job_status['status'] != new_job_status['status']
-
-
-def run_jenkins_notifier():
-    current_status = None
+class JenkinsChecker:
+    current_status = ''
     old_status_info = {}
-    while True:
+
+    def status_changed(self, old_job_status, new_job_status):
+        return 'status' in self.old_status_info and old_job_status['status'] != new_job_status['status']
+
+    def sleep(self):
+        sleep(pause)
+
+    def check_jobs(self):
         print
         print "%s Check jenkins status" % datetime.now()
 
         jobs = get_jobs(jenkins_url)
         if not jobs:
-            sleep(pause)
-            continue
+            return
 
         new_status_info = jobs_running_info(jobs)
 
@@ -127,7 +129,7 @@ def run_jenkins_notifier():
         working_message = ''
         info_message = ''
         for name, new_job_status in new_status_info.iteritems():
-            old_job_status = old_status_info.get(name)
+            old_job_status = self.old_status_info.get(name)
             if name in excludes:
                 pass
             elif new_job_status['status'] == 'RUNNING':
@@ -138,7 +140,7 @@ def run_jenkins_notifier():
                                                               new_job_status['cause'])
             elif new_job_status['status'] != 'SUCCESS':
                 error_message = '%s<br>%s %s' % (error_message, new_job_status['name'], new_job_status['status'])
-            elif status_changed(old_job_status, new_job_status, old_status_info):
+            elif self.status_changed(old_job_status, new_job_status):
                 info_message = '%s<br>%s %s -> %s' % (info_message,
                                                       new_job_status['name'],
                                                       old_job_status['status'],
@@ -156,16 +158,18 @@ def run_jenkins_notifier():
             notify(header, msg, 'jenkins-ok.gif')
             current_status = 'IN_PROGRESS'
         else:
-            if current_status != 'SUCCESS':
+            if self.current_status != 'SUCCESS':
                 print "No errors found"
                 msg = '%s <br> <br> %s' % (info_message, working_message)
                 header = 'Builds are ok'
                 notify(header, msg, 'jenkins-ok.gif')
-            current_status = 'SUCCESS'
+            self.current_status = 'SUCCESS'
 
-        old_status_info = new_status_info
-        sleep(pause)
+        self.old_status_info = new_status_info
 
 
 if __name__ == '__main__':
-    run_jenkins_notifier()
+    jenkins_checker = JenkinsChecker()
+    while True:
+        jenkins_checker.check_jobs()
+        jenkins_checker.sleep()
