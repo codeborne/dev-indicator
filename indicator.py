@@ -7,11 +7,10 @@ from subprocess import Popen, PIPE
 
 import gtk
 import appindicator
-from threading import Timer, Thread
+from threading import Thread
 import time
-import sys
 
-is_alive = True
+timer = None
 selected_names = []
 
 names = [
@@ -53,7 +52,6 @@ def add_name(menu, name):
 def quit_program(widget):
     gtk.threads_leave()
     gtk.main_quit()
-    sys.exit(0)
 
 
 def add_action(menu, text, handler):
@@ -95,6 +93,10 @@ def reset_git_username():
 
 
 class UserReset(Thread):
+    def __init__(self, group=None, target=None, name=None, args=(), kwargs=None, verbose=None):
+        super(UserReset, self).__init__(group, target, name, args, kwargs, verbose)
+        self.setDaemon(True)
+
     def reset_user_at_midnight(self):
         hour = datetime.now().hour
         if hour == 0:
@@ -107,13 +109,18 @@ class UserReset(Thread):
             time.sleep(60*55)
 
 
-def run_jenkins_notifier():
-    from jenkins_desktop_notify import JenkinsChecker
-    jenkins_checker = JenkinsChecker()
-    global is_alive
-    while is_alive:
-        jenkins_checker.check_jobs()
-        jenkins_checker.sleep()
+class JenkinsNotifier(Thread):
+    def __init__(self, group=None, target=None, name=None, args=(), kwargs=None, verbose=None):
+        super(JenkinsNotifier, self).__init__(group, target, name, args, kwargs, verbose)
+        self.setDaemon(True)
+
+    def run(self):
+        from jenkins_desktop_notify import JenkinsChecker
+        jenkins_checker = JenkinsChecker()
+
+        while True:
+            jenkins_checker.check_jobs()
+            jenkins_checker.sleep()
 
 
 if __name__ == "__main__":
@@ -129,13 +136,12 @@ if __name__ == "__main__":
 
     for name in names:
         add_name(menu, name)
-    # add_action(menu, 'exit', quit_program)
+    add_action(menu, 'exit', quit_program)
 
     ind.set_menu(menu)
 
-    Timer(5, run_jenkins_notifier).start()
-
     UserReset().start()
+    JenkinsNotifier().start()
 
     gtk.threads_init()
     gtk.threads_enter()
