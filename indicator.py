@@ -116,11 +116,7 @@ class JenkinsNotifier(Thread):
 
     def run(self):
         from jenkins_desktop_notify import JenkinsChecker
-        jenkins_checker = JenkinsChecker()
-
-        while True:
-            jenkins_checker.check_jobs()
-            jenkins_checker.sleep()
+        JenkinsChecker().run()
 
 
 if __name__ == "__main__":

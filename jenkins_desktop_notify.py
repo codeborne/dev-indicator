@@ -109,6 +109,11 @@ class JenkinsChecker:
     current_status = ''
     old_status_info = {}
 
+    def run(self):
+        while True:
+            self.check_jobs()
+            self.sleep()
+
     def status_changed(self, old_job_status, new_job_status):
         return 'status' in self.old_status_info and old_job_status['status'] != new_job_status['status']
 
@@ -169,7 +174,4 @@ class JenkinsChecker:
 
 
 if __name__ == '__main__':
-    jenkins_checker = JenkinsChecker()
-    while True:
-        jenkins_checker.check_jobs()
-        jenkins_checker.sleep()
+    JenkinsChecker().run()
