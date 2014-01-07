@@ -9,6 +9,7 @@ import gtk
 import appindicator
 from threading import Thread
 import time
+from gtk._gtk import CheckMenuItem
 
 timer = None
 selected_names = []
@@ -40,7 +41,7 @@ names = [
 
 
 def add_name(menu, name):
-    menu_item = gtk.CheckMenuItem(name)
+    menu_item = CheckMenuItem(name)
     if is_selected(name):
         menu_item.set_active(True)
 
@@ -93,15 +94,23 @@ def reset_git_username():
 
 
 class UserReset(Thread):
-    def __init__(self, group=None, target=None, name=None, args=(), kwargs=None, verbose=None):
-        super(UserReset, self).__init__(group, target, name, args, kwargs, verbose)
+    def __init__(self, menu):
+        super(UserReset, self).__init__(name='UserReset')
         self.setDaemon(True)
+        self.menu = menu
+
+    def _uncheck_users_in_menu(self):
+        for menu_item in self.menu.get_children():
+            if isinstance(menu_item, CheckMenuItem):
+                menu_item.set_active(False)
 
     def reset_user_at_midnight(self):
+        self._uncheck_users_in_menu()
         hour = datetime.now().hour
         if hour == 0:
             print "Reset git user at midnight %s" % datetime.now()
             reset_git_username()
+            self._uncheck_users_in_menu()
 
     def run(self):
         while True:
@@ -110,8 +119,8 @@ class UserReset(Thread):
 
 
 class JenkinsNotifier(Thread):
-    def __init__(self, group=None, target=None, name=None, args=(), kwargs=None, verbose=None):
-        super(JenkinsNotifier, self).__init__(group, target, name, args, kwargs, verbose)
+    def __init__(self):
+        super(JenkinsNotifier, self).__init__(name='JenkinsNotifier')
         self.setDaemon(True)
 
     def run(self):
@@ -136,7 +145,7 @@ if __name__ == "__main__":
 
     ind.set_menu(menu)
 
-    UserReset().start()
+    UserReset(menu).start()
     JenkinsNotifier().start()
 
     gtk.threads_init()
