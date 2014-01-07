@@ -9,7 +9,8 @@ import gtk
 import appindicator
 from threading import Thread
 import time
-from gtk._gtk import CheckMenuItem
+from gtk._gtk import CheckMenuItem, SeparatorMenuItem
+from jenkins_desktop_notify import JenkinsChecker
 
 timer = None
 selected_names = []
@@ -47,7 +48,6 @@ def add_name(menu, name):
 
     menu.append(menu_item)
     menu_item.connect("activate", name_selected)
-    menu_item.show()
 
 
 def quit_program(widget):
@@ -59,7 +59,6 @@ def add_action(menu, text, handler):
     menu_item = gtk.MenuItem(text)
     menu.append(menu_item)
     menu_item.connect("activate", handler)
-    menu_item.show()
 
 
 def is_selected(name):
@@ -118,13 +117,13 @@ class UserReset(Thread):
 
 
 class JenkinsNotifier(Thread):
-    def __init__(self):
+    def __init__(self, jenkins_checker):
         super(JenkinsNotifier, self).__init__(name='JenkinsNotifier')
         self.setDaemon(True)
+        self.jenkins_checker = jenkins_checker
 
     def run(self):
-        from jenkins_desktop_notify import JenkinsChecker
-        JenkinsChecker().run()
+        jenkins_checker.run()
 
 
 if __name__ == "__main__":
@@ -140,12 +139,19 @@ if __name__ == "__main__":
 
     for name in names:
         add_name(menu, name)
-    add_action(menu, 'exit', quit_program)
+
+    separator = SeparatorMenuItem()
+    menu.append(separator)
+
+    add_action(menu, 'Quit', quit_program)
+    menu.show_all()
 
     ind.set_menu(menu)
 
     UserReset(menu).start()
-    JenkinsNotifier().start()
+
+    jenkins_checker = JenkinsChecker()
+    JenkinsNotifier(jenkins_checker).start()
 
     gtk.threads_init()
     gtk.threads_enter()
