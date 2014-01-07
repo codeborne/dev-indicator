@@ -105,7 +105,6 @@ class UserReset(Thread):
                 menu_item.set_active(False)
 
     def reset_user_at_midnight(self):
-        self._uncheck_users_in_menu()
         hour = datetime.now().hour
         if hour == 0:
             print "Reset git user at midnight %s" % datetime.now()
