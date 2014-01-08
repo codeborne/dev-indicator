@@ -123,10 +123,10 @@ class AutoUpdate(Thread):
 
     def _check_for_updates(self):
         print "Check for updates..."
-        updates = Popen(["git", "pullxx"], stdout=PIPE).communicate()[0]
+        updates = Popen(["git", "pullxx"], stdout=PIPE, stderr=PIPE).communicate()[0]
 
         if updates and 'Already up-to-date' not in updates:
-            print updates
+            print 'Updates found: %s' % updates
             print "Restarting"
             os.execl(__file__, __file__)
 
