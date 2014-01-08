@@ -106,10 +106,11 @@ class UserReset(Thread):
     def _check_for_updates(self):
         print "Check for updates..."
         updates = Popen(["git", "pull"], stdout=PIPE).communicate()[0]
-	if updates:
-	        print updates
-        	print "Restarting"
-	        os.execl(__file__, __file__)
+
+        if updates and 'Already up-to-date' not in updates:
+            print updates
+            print "Restarting"
+            os.execl(__file__, __file__)
 
     def reset_user_at_midnight(self):
         self._check_for_updates()
@@ -125,7 +126,7 @@ class UserReset(Thread):
     def run(self):
         while True:
             self.reset_user_at_midnight()
-            time.sleep(60*55)
+            time.sleep(1)  # 60*55
 
 
 class JenkinsNotifier(Thread):
