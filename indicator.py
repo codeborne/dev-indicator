@@ -103,30 +103,41 @@ class UserReset(Thread):
             if isinstance(menu_item, CheckMenuItem):
                 menu_item.set_active(False)
 
-    def _check_for_updates(self):
-        print "Check for updates..."
-        updates = Popen(["git", "pull"], stdout=PIPE).communicate()[0]
-
-        if updates and 'Already up-to-date' not in updates:
-            print updates
-            print "Restarting"
-            os.execl(__file__, __file__)
-
     def reset_user_at_midnight(self):
-        self._check_for_updates()
-
         hour = datetime.now().hour
         if hour == 0:
             print "Reset git user at midnight %s" % datetime.now()
             reset_git_username()
             self._uncheck_users_in_menu()
 
-            self._check_for_updates()
-
     def run(self):
         while True:
             self.reset_user_at_midnight()
-            time.sleep(1)  # 60*55
+            time.sleep(60*55)
+
+
+class AutoUpdate(Thread):
+    def __init__(self):
+        super(AutoUpdate, self).__init__(name='AutoUpdate')
+        self.setDaemon(True)
+
+    def _check_for_updates(self):
+        print "Check for updates..."
+        updates = Popen(["git", "pullxx"], stdout=PIPE).communicate()[0]
+
+        if updates and 'Already up-to-date' not in updates:
+            print updates
+            print "Restarting"
+            os.execl(__file__, __file__)
+
+    def run(self):
+        while True:
+            try:
+                self._check_for_updates()
+                time.sleep(60)
+            except Exception as e:
+                print 'Failed to update: %s' % e
+                time.sleep(60*60)
 
 
 class JenkinsNotifier(Thread):
@@ -161,6 +172,7 @@ if __name__ == "__main__":
 
     ind.set_menu(menu)
 
+    AutoUpdate().start()
     UserReset(menu).start()
 
     jenkins_checker = JenkinsChecker()
