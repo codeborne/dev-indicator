@@ -103,12 +103,24 @@ class UserReset(Thread):
             if isinstance(menu_item, CheckMenuItem):
                 menu_item.set_active(False)
 
+    def _check_for_updates(self):
+        print "Check for updates..."
+        updates = Popen(["git", "pull"], stdout=PIPE).communicate()[0]
+        print updates
+
+        print "Restarting"
+        os.execl(__file__, __file__)
+
     def reset_user_at_midnight(self):
+        self._check_for_updates()
+
         hour = datetime.now().hour
         if hour == 0:
             print "Reset git user at midnight %s" % datetime.now()
             reset_git_username()
             self._uncheck_users_in_menu()
+
+            self._check_for_updates()
 
     def run(self):
         while True:
@@ -133,7 +145,7 @@ if __name__ == "__main__":
 
     ind = appindicator.Indicator("git-indicator", "krb-valid-ticket", appindicator.CATEGORY_OTHER)
     ind.set_status(appindicator.STATUS_ACTIVE)
-    ind.set_label(current_git_username)
+    ind.set_label('I watch you, %s' % current_git_username)
 
     menu = gtk.Menu()
 
