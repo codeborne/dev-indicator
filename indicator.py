@@ -134,10 +134,10 @@ class AutoUpdate(Thread):
         while True:
             try:
                 self._check_for_updates()
-                time.sleep(60)
+                time.sleep(1)
             except Exception as e:
                 print 'Failed to update: %s' % e
-                time.sleep(60*60)
+                time.sleep(10)
 
 
 class JenkinsNotifier(Thread):
