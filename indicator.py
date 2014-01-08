@@ -123,7 +123,7 @@ class AutoUpdate(Thread):
 
     def _check_for_updates(self):
         print "Check for updates..."
-        updates = Popen(["git", "pull"], stdout=PIPE, stderr=STDOUT).communicate()[0]
+        updates = Popen(["git", "pull"], cwd=os.path.dirname(os.path.realpath(__file__)), stdout=PIPE, stderr=STDOUT).communicate()[0]
 
         if updates:
             if 'Aborting' in updates:
