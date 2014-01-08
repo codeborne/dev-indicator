@@ -137,7 +137,7 @@ class AutoUpdate(Thread):
         while True:
             try:
                 self._check_for_updates()
-                time.sleep(1)
+                time.sleep(60*5)
             except Exception as e:
                 print 'Failed to update: %s' % e
                 time.sleep(60*60)
