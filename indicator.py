@@ -160,7 +160,7 @@ if __name__ == "__main__":
 
     ind = appindicator.Indicator("git-indicator", "krb-valid-ticket", appindicator.CATEGORY_OTHER)
     ind.set_status(appindicator.STATUS_ACTIVE)
-    ind.set_label('You: %s' % current_git_username)
+    ind.set_label(current_git_username)
 
     menu = gtk.Menu()
 
