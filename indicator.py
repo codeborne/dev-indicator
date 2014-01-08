@@ -3,7 +3,7 @@
 from datetime import datetime
 import os
 import re
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, STDOUT
 
 import gtk
 import appindicator
@@ -123,12 +123,15 @@ class AutoUpdate(Thread):
 
     def _check_for_updates(self):
         print "Check for updates..."
-        updates = Popen(["git", "pull"], stdout=PIPE).communicate()[0]
+        updates = Popen(["git", "pull"], stdout=PIPE, stderr=STDOUT).communicate()[0]
 
-        if updates and 'Already up-to-date' not in updates:
-            print 'Updates found: %s' % updates
-            print "Restarting"
-            os.execl(__file__, __file__)
+        if updates:
+            if 'Aborting' in updates:
+                raise Exception(updates)
+            elif 'Already up-to-date' not in updates:
+                print 'Updates found: %s' % updates
+                print "Restarting"
+                os.execl(__file__, __file__)
 
     def run(self):
         while True:
@@ -137,7 +140,7 @@ class AutoUpdate(Thread):
                 time.sleep(1)
             except Exception as e:
                 print 'Failed to update: %s' % e
-                time.sleep(10)
+                time.sleep(60*60)
 
 
 class JenkinsNotifier(Thread):
