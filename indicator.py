@@ -106,10 +106,10 @@ class UserReset(Thread):
     def _check_for_updates(self):
         print "Check for updates..."
         updates = Popen(["git", "pull"], stdout=PIPE).communicate()[0]
-        print updates
-
-        print "Restarting"
-        os.execl(__file__, __file__)
+	if updates:
+	        print updates
+        	print "Restarting"
+	        os.execl(__file__, __file__)
 
     def reset_user_at_midnight(self):
         self._check_for_updates()
