@@ -50,6 +50,11 @@ def add_name(menu, name):
     menu_item.connect("activate", name_selected)
 
 
+def restart_program(widget=None):
+    print "Restarting"
+    os.execl(__file__, __file__)
+
+
 def quit_program(widget):
     gtk.threads_leave()
     gtk.main_quit()
@@ -130,8 +135,7 @@ class AutoUpdate(Thread):
                 raise Exception(updates)
             elif 'Already up-to-date' not in updates:
                 print 'Updates found: %s' % updates
-                print "Restarting"
-                os.execl(__file__, __file__)
+                restart_program()
 
     def run(self):
         while True:
@@ -170,6 +174,7 @@ if __name__ == "__main__":
     separator = SeparatorMenuItem()
     menu.append(separator)
 
+    add_action(menu, 'Restart', restart_program)
     add_action(menu, 'Quit', quit_program)
     menu.show_all()
 
