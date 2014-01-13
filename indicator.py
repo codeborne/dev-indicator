@@ -19,7 +19,9 @@ names = [
     "Aho Augasmägi",
     "Aivar Naaber",
     "Andrei Solntsev",
+    "Annika Tammik",
     "Anton Keks",
+    "Elina Matvejeva",
     "Erik Jõgi",
     "Erkki Teedla",
     "Jaan Sepp",
@@ -30,14 +32,12 @@ names = [
     "Maksim Säkki",
     "Marko Randrüüt",
     "Marek Kusmin",
+    "Martin Beldman",
     "Patrick Abner",
     "Revo Sirel",
     "Tanel Tamm",
     "Tarmo Ojala",
-    "Vadim Gerassimov",
-    "Elina Matvejeva",
-    "Annika Tammik",
-    "Martin Beldman"
+    "Vadim Gerassimov"
 ]
 
 
