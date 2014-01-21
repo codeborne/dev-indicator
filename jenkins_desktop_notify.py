@@ -12,7 +12,7 @@ from subprocess import Popen
 import string
 from time import sleep
 
-jenkins_url = 'https://jenkins.codeborne.com:444/view/All/'
+jenkins_url = 'https://jenkins.codeborne.com:444/view/Wall/'
 pause = 60
 excludes = []
 
