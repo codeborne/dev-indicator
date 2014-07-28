@@ -30,11 +30,11 @@ names = [
     "Kunnar Klauks",
     "Kristjan Kokk",
     "Maksim Säkki",
-    "Marko Randrüüt",
     "Marek Kusmin",
     "Martin Beldman",
     "Patrick Abner",
     "Revo Sirel",
+    "Sven Eller",
     "Tanel Tamm",
     "Tarmo Ojala",
     "Vadim Gerassimov"
