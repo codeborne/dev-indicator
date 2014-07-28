@@ -32,6 +32,7 @@ names = [
     "Maksim Säkki",
     "Marek Kusmin",
     "Martin Beldman",
+    "Nikita Abramenkov",
     "Patrick Abner",
     "Revo Sirel",
     "Sven Eller",
