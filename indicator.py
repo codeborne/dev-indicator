@@ -21,6 +21,7 @@ names = [
     "Andrei Solntsev",
     "Annika Tammik",
     "Anton Keks",
+    "Dmitri Troskov",
     "Elina Matvejeva",
     "Erik Jõgi",
     "Erkki Teedla",
