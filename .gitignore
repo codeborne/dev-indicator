@@ -1,4 +1,5 @@
 *.iml
 *.log
 *.pyc
-
+*.ipr
+*.iws
