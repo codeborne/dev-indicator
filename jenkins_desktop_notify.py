@@ -14,7 +14,7 @@ from time import sleep
 
 jenkins_url = 'https://jenkins.codeborne.com:444/view/Wall/'
 pause = 60
-excludes = []
+excludes = ['amserv']
 
 
 def get_jobs(jenkins_url):
@@ -89,7 +89,7 @@ def ask(url):
         json_response = urllib2.urlopen(request).read()
     except Exception as e:
         print "Invalid response from url %s, caused by: %s" % (secure_url, e)
-        notify('Jenkins is unavailable', '%s' % e)
+        #notify('Jenkins is unavailable', '%s' % e)
         return {}
 
     try:
@@ -160,7 +160,7 @@ class JenkinsChecker:
             print "Work in progress"
             msg = '%s <br> <br> %s' % (info_message, working_message)
             header = 'Building...'
-            notify(header, msg, 'jenkins-ok.gif')
+            #notify(header, msg, 'jenkins-ok.gif')
             current_status = 'IN_PROGRESS'
         else:
             if self.current_status != 'SUCCESS':
