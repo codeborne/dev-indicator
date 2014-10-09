@@ -30,14 +30,19 @@ names = [
     "Kunnar Klauks",
     "Kristjan Kokk",
     "Maksim Säkki",
-    "Marko Randrüüt",
     "Marek Kusmin",
     "Martin Beldman",
     "Patrick Abner",
     "Revo Sirel",
     "Tanel Tamm",
     "Tarmo Ojala",
-    "Vadim Gerassimov"
+    "Vadim Gerassimov",
+    "Delia Viirmaa",
+    "Dmitri Ess",
+    "Ester Eggert",
+    "Kätlin Hein",
+    "Monika Põldma",
+    "Ülla Poola"
 ]
 
 
