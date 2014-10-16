@@ -11,11 +11,18 @@ from itertools import imap
 from subprocess import Popen
 import string
 from time import sleep
+import os.path
+from os.path import expanduser
 
 jenkins_url = 'https://jenkins.codeborne.com:444/view/Wall/'
 pause = 60
-excludes = ['amserv']
 
+jobs_file = expanduser("~") + '/.devindicator.jobs'
+if os.path.isfile(jobs_file):
+    with open(jobs_file) as f:
+        includes = [line.strip() for line in f]
+else:
+    includes = []
 
 def get_jobs(jenkins_url):
     def make_job(job):
@@ -135,7 +142,7 @@ class JenkinsChecker:
         info_message = ''
         for name, new_job_status in new_status_info.iteritems():
             old_job_status = self.old_status_info.get(name)
-            if name in excludes:
+            if includes and name not in includes:
                 pass
             elif new_job_status['status'] == 'RUNNING':
                 working_message = '%s<br>%s %s %s  %s<br>' % (working_message,
