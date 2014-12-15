@@ -44,7 +44,8 @@ names = [
     "Ester Eggert",
     "Kätlin Hein",
     "Monika Põldma",
-    "Ülla Poola"
+    "Ülla Poola",
+    "Dmitri Torškov"
 ]
 
 
