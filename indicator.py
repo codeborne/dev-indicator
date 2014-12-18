@@ -21,17 +21,23 @@ names = [
     "Andrei Solntsev",
     "Annika Tammik",
     "Anton Keks",
+    "Delia Viirmaa",
+    "Dmitri Ess",
+    "Dmitri Torškov",
     "Elina Matvejeva",
     "Erik Jõgi",
     "Erkki Teedla",
+    "Ester Eggert",
     "Jaan Sepp",
     "Jarmo Pertman",
     "Kirill Klenski",
     "Kunnar Klauks",
     "Kristjan Kokk",
+    "Kätlin Hein",
     "Maksim Säkki",
     "Marek Kusmin",
     "Martin Beldman",
+    "Monika Põldma",
     "Nikita Abramenkov",
     "Patrick Abner",
     "Revo Sirel",
@@ -39,13 +45,7 @@ names = [
     "Tanel Tamm",
     "Tarmo Ojala",
     "Vadim Gerassimov",
-    "Delia Viirmaa",
-    "Dmitri Ess",
-    "Ester Eggert",
-    "Kätlin Hein",
-    "Monika Põldma",
-    "Ülla Poola",
-    "Dmitri Torškov"
+    "Ülla Poola"
 ]
 
 
