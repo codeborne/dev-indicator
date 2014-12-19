@@ -23,7 +23,7 @@ names = [
     "Anton Keks",
     "Delia Viirmaa",
     "Dmitri Ess",
-    "Dmitri Torškov",
+    "Dmitri Troškov",
     "Elina Matvejeva",
     "Erik Jõgi",
     "Erkki Teedla",
