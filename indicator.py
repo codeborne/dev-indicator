@@ -21,13 +21,11 @@ names = [
     "Andrei Solntsev",
     "Annika Tammik",
     "Anton Keks",
-    "Delia Viirmaa",
     "Dmitri Ess",
     "Dmitri Troškov",
     "Elina Matvejeva",
     "Erik Jõgi",
     "Erkki Teedla",
-    "Ester Eggert",
     "Jaan Sepp",
     "Jarmo Pertman",
     "Kirill Klenski",
@@ -37,15 +35,13 @@ names = [
     "Maksim Säkki",
     "Marek Kusmin",
     "Martin Beldman",
-    "Monika Põldma",
     "Nikita Abramenkov",
     "Patrick Abner",
     "Revo Sirel",
     "Sven Eller",
     "Tanel Tamm",
     "Tarmo Ojala",
-    "Vadim Gerassimov",
-    "Ülla Poola"
+    "Vadim Gerassimov"
 ]
 
 
