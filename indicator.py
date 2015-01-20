@@ -41,7 +41,8 @@ names = [
     "Sven Eller",
     "Tanel Tamm",
     "Tarmo Ojala",
-    "Vadim Gerassimov"
+    "Vadim Gerassimov",
+    "Openway"
 ]
 
 
