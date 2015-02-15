@@ -13,6 +13,7 @@ import string
 from time import sleep
 import os.path
 from os.path import expanduser
+from cbhttp import cb_auth_header
 
 jenkins_url = 'https://jenkins.codeborne.com:444/view/Wall/'
 pause = 60
@@ -39,10 +40,6 @@ def jobs_running_info(jobs):
     def make_job(job):
         return job.get('name'), get_job_status(job)
     return dict(make_job(job) for job in jobs)
-
-
-def _make_secure_url(url):
-    return string.replace(url, 'com/', 'com:444/')
 
 
 def get_scm_changes(job_status):
@@ -86,23 +83,20 @@ def get_job_status(job):
 
 
 def ask(url):
-    secure_url = _make_secure_url(url)
-    request = urllib2.Request(secure_url)
-    temp = 'jenkins_viewer:Сколько у государства не воруй — все равно своего не вернешь!'
-    base64string = base64.encodestring(temp).replace('\n', '')
-    request.add_header("Authorization", u"Basic %s" % base64string)
+    request = urllib2.Request(url)
+    request.add_header("Authorization", u"Basic %s" % cb_auth_header())
 
     try:
         json_response = urllib2.urlopen(request).read()
     except Exception as e:
-        print "Invalid response from url %s, caused by: %s" % (secure_url, e)
+        print "Invalid response from url %s, caused by: %s" % (url, e)
         #notify('Jenkins is unavailable', '%s' % e)
         return {}
 
     try:
         return loads(json_response)
     except ValueError as e:
-        print u"Invalid response from url %s, caused by: %s, json: %s" % (secure_url, e, json_response)
+        print u"Invalid response from url %s, caused by: %s, json: %s" % (url, e, json_response)
         notify('Jenkins is inadequate', '%s' % e)
         return {}
 
