@@ -46,6 +46,7 @@ names = [
 class Indicator:
     selected_names = []
     select_time = None
+    ind = None
 
     def __init__(self):
         self.current_git_username = Popen(["git", "config", "--global", "user.name"], stdout=PIPE).communicate()[0].strip()
@@ -61,15 +62,38 @@ class Indicator:
     def remove(self, name):
         self.selected_names.remove(name)
 
+    def _add_name_item(self, menu, name):
+        menu_item = CheckMenuItem(name)
+        if indicator.is_selected(name):
+            menu_item.set_active(True)
+
+        menu.append(menu_item)
+        menu_item.connect("activate", name_selected)
+
+    def _add_action_item(self, menu, text, handler):
+        menu_item = gtk.MenuItem(text)
+        menu.append(menu_item)
+        menu_item.connect("activate", handler)
+
+    def build_menu(self):
+        self.ind = appindicator.Indicator("git-indicator", "krb-valid-ticket", appindicator.CATEGORY_OTHER)
+        self.ind.set_status(appindicator.STATUS_ACTIVE)
+        self.ind.set_label(self.current_git_username)
+
+        menu = gtk.Menu()
+
+        for name in names: self._add_name_item(menu, name)
+
+        separator = SeparatorMenuItem()
+        menu.append(separator)
+
+        self._add_action_item(menu, 'Restart', restart_program)
+        self._add_action_item(menu, 'Quit', quit_program)
+        menu.show_all()
+
+        self.ind.set_menu(menu)
+
 indicator = Indicator()
-
-def add_name(menu, name):
-    menu_item = CheckMenuItem(name)
-    if indicator.is_selected(name):
-        menu_item.set_active(True)
-
-    menu.append(menu_item)
-    menu_item.connect("activate", name_selected)
 
 def restart_program(widget=None):
     print "Restarting"
@@ -78,11 +102,6 @@ def restart_program(widget=None):
 def quit_program(widget=None):
     gtk.threads_leave()
     gtk.main_quit()
-
-def add_action(menu, text, handler):
-    menu_item = gtk.MenuItem(text)
-    menu.append(menu_item)
-    menu_item.connect("activate", handler)
 
 def name_selected(widget):
     name = widget.get_label()
@@ -100,13 +119,13 @@ def name_selected(widget):
     reset_git_username()
     os.system(u"git config --global user.name '%s'" % git_username)
     os.system(u"git config --global user.email '%s'" % git_email)
-    ind.set_label(git_username)
+    indicator.ind.set_label(git_username)
 
 
 def reset_git_username():
     os.system("git config --global --unset user.name")
     os.system("git config --global --unset user.email")
-    ind.set_label('')
+    indicator.ind.set_label('')
 
 
 class UserReset(Thread):
@@ -170,23 +189,7 @@ class JenkinsNotifier(Thread):
 
 
 if __name__ == "__main__":
-    ind = appindicator.Indicator("git-indicator", "krb-valid-ticket", appindicator.CATEGORY_OTHER)
-    ind.set_status(appindicator.STATUS_ACTIVE)
-    ind.set_label(indicator.current_git_username)
-
-    menu = gtk.Menu()
-
-    for name in names:
-        add_name(menu, name)
-
-    separator = SeparatorMenuItem()
-    menu.append(separator)
-
-    add_action(menu, 'Restart', restart_program)
-    add_action(menu, 'Quit', quit_program)
-    menu.show_all()
-
-    ind.set_menu(menu)
+    indicator.build_menu()
 
     #AutoUpdate().start()
     #UserReset(menu).start()
