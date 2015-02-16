@@ -5,6 +5,7 @@ from threading import Thread
 import re
 import time
 import json
+import commands
 import httplib, urllib
 from subprocess import Popen, PIPE, STDOUT
 from cbhttp import cb_auth_header
@@ -24,6 +25,9 @@ class HoursReporter(Thread):
         self.indicator = indicator
 
     def report_hours_at_the_end_of_day(self):
+        commits = self.find_commits()
+        if not commits: return
+
         self.login()
         employees = self.employee_list()
         selected_employee_ids = self.find_employee_ids(employees)
@@ -39,7 +43,7 @@ class HoursReporter(Thread):
         data = [('date', select_time.strftime('%d.%m.%Y')),
                 ('project', autofill_project_id),
                 ('story', ''),
-                ('details', self.find_commits()),
+                ('details', commits),
                 ('hours', hours), ('minutes', minutes)]
         for id in selected_employee_ids: data += [('employees', id)]
         print "Reporting %s" % data
@@ -71,14 +75,19 @@ class HoursReporter(Thread):
         print response.status, response.reason, response.getheaders(), response.read()
 
     def find_commits(self):
-        return ''.join([Popen(["git", "log", "--since", "yesterday", "--oneline", "--author", "Anton Keks", "--no-merges", "--format=%s"], stdout=PIPE, cwd=repo).communicate()[0]
+        return ''.join([Popen(["git", "log", "--since", "yesterday", "--oneline", "--author", ', '.join(self.indicator.selected_names), "--no-merges", "--format=%s"], stdout=PIPE, cwd=repo).communicate()[0]
                  for repo in autofill_repos])[:400]
+
+    def is_screen_locked(self):
+        output = commands.getoutput('ps x')
+        return 'unity-panel-service --lockscreen' in output
 
     def run(self):
         while True:
             hour = datetime.now().hour
-            if hour == 18:
+            if hour >= 18 and not self.indicator.selected_names and self.is_screen_locked():
                 self.report_hours_at_the_end_of_day()
+                self.indicator.selected_names = []
             time.sleep(60*10)
 
     def start(self):
@@ -93,4 +102,4 @@ if __name__ == "__main__":
 
     reporter = HoursReporter(FakeIndicator(['Anton Keks']))
     reporter.report_hours_at_the_end_of_day()
-    #print reporter.find_commits()
+    # print reporter.find_commits()
