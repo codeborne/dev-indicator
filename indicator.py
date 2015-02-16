@@ -62,18 +62,49 @@ class Indicator:
     def remove(self, name):
         self.selected_names.remove(name)
 
+    def reset_git_username(self):
+        os.system("git config --global --unset user.name")
+        os.system("git config --global --unset user.email")
+        indicator.ind.set_label('')
+
+    def name_selected(self, widget):
+        name = widget.get_label()
+
+        if self.is_selected(name):
+            self.remove(name)
+        else:
+            self.add(name)
+
+        self.selected_emails = [re.sub(r" .*$", "@codeborne.com", name.lower()) for name in self.selected_names]
+
+        git_username = ", ".join(self.selected_names)
+        git_email = ", ".join(self.selected_emails)
+
+        self.reset_git_username()
+        os.system(u"git config --global user.name '%s'" % git_username)
+        os.system(u"git config --global user.email '%s'" % git_email)
+        self.ind.set_label(git_username)
+
     def _add_name_item(self, menu, name):
         menu_item = CheckMenuItem(name)
         if indicator.is_selected(name):
             menu_item.set_active(True)
 
         menu.append(menu_item)
-        menu_item.connect("activate", name_selected)
+        menu_item.connect("activate", self.name_selected)
 
     def _add_action_item(self, menu, text, handler):
         menu_item = gtk.MenuItem(text)
         menu.append(menu_item)
         menu_item.connect("activate", handler)
+
+    def quit(self, widget=None):
+        gtk.threads_leave()
+        gtk.main_quit()
+
+    def restart(self, widget=None):
+        print "Restarting"
+        os.execl(__file__, __file__)
 
     def build_menu(self):
         self.ind = appindicator.Indicator("git-indicator", "krb-valid-ticket", appindicator.CATEGORY_OTHER)
@@ -87,46 +118,13 @@ class Indicator:
         separator = SeparatorMenuItem()
         menu.append(separator)
 
-        self._add_action_item(menu, 'Restart', restart_program)
-        self._add_action_item(menu, 'Quit', quit_program)
+        self._add_action_item(menu, 'Restart', self.restart)
+        self._add_action_item(menu, 'Quit', self.quit)
         menu.show_all()
 
         self.ind.set_menu(menu)
 
 indicator = Indicator()
-
-def restart_program(widget=None):
-    print "Restarting"
-    os.execl(__file__, __file__)
-
-def quit_program(widget=None):
-    gtk.threads_leave()
-    gtk.main_quit()
-
-def name_selected(widget):
-    name = widget.get_label()
-
-    if indicator.is_selected(name):
-        indicator.remove(name)
-    else:
-        indicator.add(name)
-
-    selected_emails = [re.sub(r" .*$", "@codeborne.com", name.lower()) for name in indicator.selected_names]
-
-    git_username = ", ".join(indicator.selected_names)
-    git_email = ", ".join(selected_emails)
-
-    reset_git_username()
-    os.system(u"git config --global user.name '%s'" % git_username)
-    os.system(u"git config --global user.email '%s'" % git_email)
-    indicator.ind.set_label(git_username)
-
-
-def reset_git_username():
-    os.system("git config --global --unset user.name")
-    os.system("git config --global --unset user.email")
-    indicator.ind.set_label('')
-
 
 class UserReset(Thread):
     def __init__(self, menu):
@@ -143,7 +141,7 @@ class UserReset(Thread):
         hour = datetime.now().hour
         if hour == 0:
             print "Reset git user at midnight %s" % datetime.now()
-            reset_git_username()
+            indicator.reset_git_username()
             self._uncheck_users_in_menu()
 
     def run(self):
@@ -166,7 +164,7 @@ class AutoUpdate(Thread):
                 raise Exception(updates)
             elif 'Already up-to-date' not in updates:
                 print 'Updates found: %s' % updates
-                restart_program()
+                indicator.restart()
 
     def run(self):
         while True:
