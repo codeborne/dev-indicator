@@ -47,6 +47,10 @@ class Indicator:
     selected_names = []
     select_time = None
 
+    def __init__(self):
+        self.current_git_username = Popen(["git", "config", "--global", "user.name"], stdout=PIPE).communicate()[0].strip()
+        self.selected_names = filter(None, [name.strip() for name in self.current_git_username.split(",")])
+
     def is_selected(self, name):
         return name in self.selected_names
 
@@ -67,11 +71,11 @@ def add_name(menu, name):
     menu.append(menu_item)
     menu_item.connect("activate", name_selected)
 
-def restart_program(widget):
+def restart_program(widget=None):
     print "Restarting"
     os.execl(__file__, __file__)
 
-def quit_program(widget):
+def quit_program(widget=None):
     gtk.threads_leave()
     gtk.main_quit()
 
@@ -166,13 +170,9 @@ class JenkinsNotifier(Thread):
 
 
 if __name__ == "__main__":
-    current_git_username = Popen(["git", "config", "--global", "user.name"], stdout=PIPE).communicate()[0]
-    current_git_username = current_git_username.strip()
-    indicator.selected_names = filter(None, [name.strip() for name in current_git_username.split(",")])
-
     ind = appindicator.Indicator("git-indicator", "krb-valid-ticket", appindicator.CATEGORY_OTHER)
     ind.set_status(appindicator.STATUS_ACTIVE)
-    ind.set_label(current_git_username)
+    ind.set_label(indicator.current_git_username)
 
     menu = gtk.Menu()
 
