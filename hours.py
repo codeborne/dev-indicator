@@ -8,7 +8,7 @@ import json
 import httplib, urllib
 from cbhttp import cb_auth_header
 
-autofill_project_id=53 # CapitalBank
+autofill_project_id=None # CapitalBank=53
 autofill_repos=['~/work/codeborne/capitalbank', '~/work/codeborne/panda', '~/work/codeborne/ibank']
 # todo: take details and stories from commits git log --since yesterday --author "Anton Keks" --oneline
 
@@ -75,6 +75,10 @@ class HoursReporter(Thread):
             if hour == 18:
                 self.report_hours_at_the_end_of_day()
             time.sleep(60*10)
+
+    def start(self):
+        if autofill_project_id:
+            super(HoursReporter, self).start()
 
 if __name__ == "__main__":
     class FakeIndicator:

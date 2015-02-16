@@ -195,7 +195,7 @@ if __name__ == "__main__":
 
     AutoUpdate(indicator).start()
     UserReset(indicator).start()
-    #HoursReporter().start()
+    HoursReporter(indicator).start()
 
     jenkins_checker = JenkinsChecker()
     JenkinsNotifier(jenkins_checker).start()
