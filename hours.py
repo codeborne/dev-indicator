@@ -11,7 +11,7 @@ from subprocess import Popen, PIPE, STDOUT
 from cbhttp import cb_auth_header
 
 autofill_project_id=None
-autofill_project_id=53 # CapitalBank
+# autofill_project_id=53 # CapitalBank
 autofill_repos=['../capitalbank', '../panda']
 
 time_host = "time.codeborne.com"
