@@ -6,11 +6,12 @@ import re
 import time
 import json
 import httplib, urllib
+from subprocess import Popen, PIPE, STDOUT
 from cbhttp import cb_auth_header
 
-autofill_project_id=None # CapitalBank=53
-autofill_repos=['~/work/codeborne/capitalbank', '~/work/codeborne/panda', '~/work/codeborne/ibank']
-# todo: take details and stories from commits git log --since yesterday --author "Anton Keks" --oneline
+autofill_project_id=None
+#autofill_project_id=53 # CapitalBank
+autofill_repos=['../capitalbank', '../panda']
 
 time_host = "time.codeborne.com"
 time_port = 444
@@ -38,7 +39,7 @@ class HoursReporter(Thread):
         data = [('date', select_time.strftime('%d.%m.%Y')),
                 ('project', autofill_project_id),
                 ('story', ''),
-                ('details', 'Autofilled by dev-indicator'),
+                ('details', self.find_commits()),
                 ('hours', hours), ('minutes', minutes)]
         for id in selected_employee_ids: data += [('employees', id)]
         print "Reporting %s" % data
@@ -69,6 +70,10 @@ class HoursReporter(Thread):
         response = conn.getresponse()
         print response.status, response.reason, response.getheaders(), response.read()
 
+    def find_commits(self):
+        return ''.join([Popen(["git", "log", "--since", "yesterday", "--oneline", "--author", "Anton Keks", "--no-merges", "--format=%s"], stdout=PIPE, cwd=repo).communicate()[0]
+                 for repo in autofill_repos])[:400]
+
     def run(self):
         while True:
             hour = datetime.now().hour
@@ -86,4 +91,6 @@ if __name__ == "__main__":
             self.selected_names = selected_names
             self.select_time = None
 
-    HoursReporter(FakeIndicator(['Anton Keks'])).report_hours_at_the_end_of_day()
+    reporter = HoursReporter(FakeIndicator(['Anton Keks']))
+    reporter.report_hours_at_the_end_of_day()
+    #print reporter.find_commits()
