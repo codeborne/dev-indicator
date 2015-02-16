@@ -45,12 +45,15 @@ names = [
 
 class Indicator:
     selected_names = []
+    selected_emails = []
     select_time = None
     ind = None
+    menu = None
 
     def __init__(self):
-        self.current_git_username = Popen(["git", "config", "--global", "user.name"], stdout=PIPE).communicate()[0].strip()
-        self.selected_names = filter(None, [name.strip() for name in self.current_git_username.split(",")])
+        current_git_username = Popen(["git", "config", "--global", "user.name"], stdout=PIPE).communicate()[0].strip()
+        self.selected_names = filter(None, [name.strip() for name in current_git_username.split(",")])
+        self.menu = self.build_menu(current_git_username)
 
     def is_selected(self, name):
         return name in self.selected_names
@@ -65,7 +68,7 @@ class Indicator:
     def reset_git_username(self):
         os.system("git config --global --unset user.name")
         os.system("git config --global --unset user.email")
-        indicator.ind.set_label('')
+        self.ind.set_label('')
 
     def name_selected(self, widget):
         name = widget.get_label()
@@ -87,7 +90,7 @@ class Indicator:
 
     def _add_name_item(self, menu, name):
         menu_item = CheckMenuItem(name)
-        if indicator.is_selected(name):
+        if self.is_selected(name):
             menu_item.set_active(True)
 
         menu.append(menu_item)
@@ -106,10 +109,10 @@ class Indicator:
         print "Restarting"
         os.execl(__file__, __file__)
 
-    def build_menu(self):
+    def build_menu(self, current_git_username):
         self.ind = appindicator.Indicator("git-indicator", "krb-valid-ticket", appindicator.CATEGORY_OTHER)
         self.ind.set_status(appindicator.STATUS_ACTIVE)
-        self.ind.set_label(self.current_git_username)
+        self.ind.set_label(current_git_username)
 
         menu = gtk.Menu()
 
@@ -123,26 +126,26 @@ class Indicator:
         menu.show_all()
 
         self.ind.set_menu(menu)
+        return menu
 
-indicator = Indicator()
-
-class UserReset(Thread):
-    def __init__(self, menu):
-        super(UserReset, self).__init__(name='UserReset')
-        self.setDaemon(True)
-        self.menu = menu
-
-    def _uncheck_users_in_menu(self):
+    def uncheck_all_names(self):
         for menu_item in self.menu.get_children():
             if isinstance(menu_item, CheckMenuItem):
                 menu_item.set_active(False)
+
+
+class UserReset(Thread):
+    def __init__(self, indicator):
+        super(UserReset, self).__init__(name='UserReset')
+        self.setDaemon(True)
+        self.indicator = indicator
 
     def reset_user_at_midnight(self):
         hour = datetime.now().hour
         if hour == 0:
             print "Reset git user at midnight %s" % datetime.now()
-            indicator.reset_git_username()
-            self._uncheck_users_in_menu()
+            self.indicator.reset_git_username()
+            self.indicator.uncheck_all_names()
 
     def run(self):
         while True:
@@ -151,9 +154,10 @@ class UserReset(Thread):
 
 
 class AutoUpdate(Thread):
-    def __init__(self):
+    def __init__(self, indicator):
         super(AutoUpdate, self).__init__(name='AutoUpdate')
         self.setDaemon(True)
+        self.indicator = indicator
 
     def _check_for_updates(self):
         print "Check for updates..."
@@ -164,7 +168,7 @@ class AutoUpdate(Thread):
                 raise Exception(updates)
             elif 'Already up-to-date' not in updates:
                 print 'Updates found: %s' % updates
-                indicator.restart()
+                self.indicator.restart()
 
     def run(self):
         while True:
@@ -187,14 +191,14 @@ class JenkinsNotifier(Thread):
 
 
 if __name__ == "__main__":
-    indicator.build_menu()
+    indicator = Indicator()
 
-    #AutoUpdate().start()
-    #UserReset(menu).start()
+    AutoUpdate(indicator).start()
+    UserReset(indicator).start()
     #HoursReporter().start()
 
-    #jenkins_checker = JenkinsChecker()
-    #JenkinsNotifier(jenkins_checker).start()
+    jenkins_checker = JenkinsChecker()
+    JenkinsNotifier(jenkins_checker).start()
 
     gtk.threads_init()
     gtk.threads_enter()
