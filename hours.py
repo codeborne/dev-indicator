@@ -9,34 +9,33 @@ import httplib, urllib
 from cbhttp import cb_auth_header
 
 autofill_project_id=53 # CapitalBank
+autofill_repos=['~/work/codeborne/capitalbank', '~/work/codeborne/panda', '~/work/codeborne/ibank']
+# todo: take details and stories from commits git log --since yesterday --author "Anton Keks" --oneline
 
 time_host = "time.codeborne.com"
 time_port = 444
 time_headers = {"Authorization": "Basic %s" % cb_auth_header()}
 
-selected_names = ['Anton Keks', 'Kirill Klenski', 'Openway']
-select_time = None
-
 class HoursReporter(Thread):
-    def __init__(self):
+    def __init__(self, indicator):
         super(HoursReporter, self).__init__(name='HoursReporter')
         self.setDaemon(True)
+        self.indicator = indicator
 
     def report_hours_at_the_end_of_day(self):
-        global select_time, selected_names
-
         self.login()
         employees = self.employee_list()
         selected_employee_ids = self.find_employee_ids(employees)
 
-        if select_time == None: select_time = datetime.now()
+        select_time = self.indicator.select_time
+        if select_time is None: select_time = datetime.now()
         if select_time.hour > 10: select_time = select_time.replace(hour=10, minute=0, second=0, microsecond=0)
 
-        time = (datetime.now() - select_time)
+        time = datetime.now() - select_time
         secondsWith15MinPrecision = int(round(time.seconds / 15.0 / 60.0) * 15 * 60)
         hours = secondsWith15MinPrecision / 3600
         minutes = (secondsWith15MinPrecision - hours*3600) / 60
-        data = [('date',select_time.strftime('%d.%m.%Y')),
+        data = [('date', select_time.strftime('%d.%m.%Y')),
                 ('project', autofill_project_id),
                 ('story', ''),
                 ('details', 'Autofilled by dev-indicator'),
@@ -59,7 +58,7 @@ class HoursReporter(Thread):
 
     def find_employee_ids(self, employees):
         selected_employee_ids = [next((e['id'] for e in employees if e['name'] == name), None)
-                                 for name in selected_names]
+                                 for name in self.indicator.selected_names]
         return [id for id in selected_employee_ids if id]
 
     def add_hours(self, data):
@@ -75,7 +74,12 @@ class HoursReporter(Thread):
             hour = datetime.now().hour
             if hour == 18:
                 self.report_hours_at_the_end_of_day()
-            time.sleep(60*55)
+            time.sleep(60*10)
 
 if __name__ == "__main__":
-    HoursReporter().report_hours_at_the_end_of_day()
+    class FakeIndicator:
+        def __init__(self, selected_names):
+            self.selected_names = selected_names
+            self.select_time = None
+
+    HoursReporter(FakeIndicator(['Anton Keks'])).report_hours_at_the_end_of_day()
