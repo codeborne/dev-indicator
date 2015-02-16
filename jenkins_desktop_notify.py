@@ -3,6 +3,7 @@
 import base64
 from datetime import datetime
 from json import loads
+from threading import Thread
 import os
 os.environ['http_proxy'] = ''
 import urllib2
@@ -173,6 +174,15 @@ class JenkinsChecker:
 
         self.old_status_info = new_status_info
 
+
+class JenkinsNotifier(Thread):
+    def __init__(self, jenkins_checker):
+        super(JenkinsNotifier, self).__init__(name='JenkinsNotifier')
+        self.setDaemon(True)
+        self.jenkins_checker = jenkins_checker
+
+    def run(self):
+        self.jenkins_checker.run()
 
 if __name__ == '__main__':
     JenkinsChecker().run()

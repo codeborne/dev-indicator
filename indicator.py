@@ -10,7 +10,7 @@ import appindicator
 from threading import Thread
 import time
 from gtk._gtk import CheckMenuItem, SeparatorMenuItem
-from jenkins_desktop_notify import JenkinsChecker
+from jenkins_desktop_notify import JenkinsChecker, JenkinsNotifier
 from hours import HoursReporter
 
 names = [
@@ -180,25 +180,13 @@ class AutoUpdate(Thread):
                 time.sleep(60*60)
 
 
-class JenkinsNotifier(Thread):
-    def __init__(self, jenkins_checker):
-        super(JenkinsNotifier, self).__init__(name='JenkinsNotifier')
-        self.setDaemon(True)
-        self.jenkins_checker = jenkins_checker
-
-    def run(self):
-        self.jenkins_checker.run()
-
-
 if __name__ == "__main__":
     indicator = Indicator()
 
     AutoUpdate(indicator).start()
     UserReset(indicator).start()
     HoursReporter(indicator).start()
-
-    jenkins_checker = JenkinsChecker()
-    JenkinsNotifier(jenkins_checker).start()
+    JenkinsNotifier(JenkinsChecker()).start()
 
     gtk.threads_init()
     gtk.threads_enter()
