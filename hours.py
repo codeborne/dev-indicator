@@ -11,7 +11,7 @@ from subprocess import Popen, PIPE, STDOUT
 from cbhttp import cb_auth_header
 
 autofill_project_id=None
-#autofill_project_id=53 # CapitalBank
+autofill_project_id=53 # CapitalBank
 autofill_repos=['../capitalbank', '../panda']
 
 time_host = "time.codeborne.com"
@@ -75,6 +75,7 @@ class HoursReporter(Thread):
         print response.status, response.reason, response.getheaders(), response.read()
 
     def find_commits(self):
+        if not self.indicator.selected_names: return ''
         return ''.join([Popen(["git", "log", "--since", "yesterday", "--oneline", "--author", ', '.join(self.indicator.selected_names), "--no-merges", "--format=%s"], stdout=PIPE, cwd=repo).communicate()[0]
                  for repo in autofill_repos])[:400]
 
@@ -85,13 +86,18 @@ class HoursReporter(Thread):
     def run(self):
         while True:
             hour = datetime.now().hour
-            if hour >= 18 and not self.indicator.selected_names and self.is_screen_locked():
-                self.report_hours_at_the_end_of_day()
-                self.indicator.selected_names = []
+            if hour >= 18 and self.indicator.selected_names:
+                if self.is_screen_locked():
+                    self.report_hours_at_the_end_of_day()
+                    self.indicator.selected_names = []
+                else:
+                    print "Not reporting hours yet as screen is not locked"
+
             time.sleep(60*10)
 
     def start(self):
         if autofill_project_id:
+            print "Starting hours autoreporter for project %s" % autofill_project_id
             super(HoursReporter, self).start()
 
 if __name__ == "__main__":
