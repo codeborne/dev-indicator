@@ -11,9 +11,7 @@ from threading import Thread
 import time
 from gtk._gtk import CheckMenuItem, SeparatorMenuItem
 from jenkins_desktop_notify import JenkinsChecker
-
-timer = None
-selected_names = []
+from hours import HoursReporter
 
 names = [
     "Aho Augasmägi",
@@ -45,49 +43,54 @@ names = [
     "Openway"
 ]
 
+class Indicator:
+    selected_names = []
+    select_time = None
+
+    def is_selected(self, name):
+        return name in self.selected_names
+
+    def add(self, name):
+        self.selected_names.append(name)
+        self.select_time = datetime.now()
+
+    def remove(self, name):
+        self.selected_names.remove(name)
+
+indicator = Indicator()
 
 def add_name(menu, name):
     menu_item = CheckMenuItem(name)
-    if is_selected(name):
+    if indicator.is_selected(name):
         menu_item.set_active(True)
 
     menu.append(menu_item)
     menu_item.connect("activate", name_selected)
 
-
-def restart_program(widget=None):
+def restart_program(widget):
     print "Restarting"
     os.execl(__file__, __file__)
-
 
 def quit_program(widget):
     gtk.threads_leave()
     gtk.main_quit()
-
 
 def add_action(menu, text, handler):
     menu_item = gtk.MenuItem(text)
     menu.append(menu_item)
     menu_item.connect("activate", handler)
 
-
-def is_selected(name):
-    global selected_names
-    return name in selected_names
-
-
 def name_selected(widget):
     name = widget.get_label()
 
-    global selected_names
-    if is_selected(name):
-        selected_names.remove(name)
+    if indicator.is_selected(name):
+        indicator.remove(name)
     else:
-        selected_names.append(name)
+        indicator.add(name)
 
-    selected_emails = [re.sub(r" .*$", "@codeborne.com", name.lower()) for name in selected_names]
+    selected_emails = [re.sub(r" .*$", "@codeborne.com", name.lower()) for name in indicator.selected_names]
 
-    git_username = ", ".join(selected_names)
+    git_username = ", ".join(indicator.selected_names)
     git_email = ", ".join(selected_emails)
 
     reset_git_username()
@@ -159,13 +162,13 @@ class JenkinsNotifier(Thread):
         self.jenkins_checker = jenkins_checker
 
     def run(self):
-        jenkins_checker.run()
+        self.jenkins_checker.run()
 
 
 if __name__ == "__main__":
     current_git_username = Popen(["git", "config", "--global", "user.name"], stdout=PIPE).communicate()[0]
     current_git_username = current_git_username.strip()
-    selected_names = filter(None, [name.strip() for name in current_git_username.split(",")])
+    indicator.selected_names = filter(None, [name.strip() for name in current_git_username.split(",")])
 
     ind = appindicator.Indicator("git-indicator", "krb-valid-ticket", appindicator.CATEGORY_OTHER)
     ind.set_status(appindicator.STATUS_ACTIVE)
@@ -185,11 +188,12 @@ if __name__ == "__main__":
 
     ind.set_menu(menu)
 
-    AutoUpdate().start()
-    UserReset(menu).start()
+    #AutoUpdate().start()
+    #UserReset(menu).start()
+    #HoursReporter().start()
 
-    jenkins_checker = JenkinsChecker()
-    JenkinsNotifier(jenkins_checker).start()
+    #jenkins_checker = JenkinsChecker()
+    #JenkinsNotifier(jenkins_checker).start()
 
     gtk.threads_init()
     gtk.threads_enter()
