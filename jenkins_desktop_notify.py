@@ -16,7 +16,8 @@ import os.path
 from os.path import expanduser
 from cbhttp import cb_auth_header
 
-jenkins_url = 'https://jenkins.codeborne.com:444/view/Wall/'
+jenkins_url_prefix = 'https://jenkins.codeborne.com:444/'
+jenkins_url = jenkins_url_prefix + 'view/Wall/'
 pause = 60
 
 jobs_file = expanduser("~") + '/.devindicator.jobs'
@@ -84,6 +85,7 @@ def get_job_status(job):
 
 
 def ask(url):
+    url = url.replace("https://jenkins.codeborne.com/", jenkins_url_prefix)
     request = urllib2.Request(url)
     request.add_header("Authorization", u"Basic %s" % cb_auth_header())
 
