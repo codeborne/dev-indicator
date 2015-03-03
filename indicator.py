@@ -41,7 +41,8 @@ names = [
     "Tanel Tamm",
     "Tarmo Ojala",
     "Vadim Gerassimov",
-    "Openway"
+    "Andrey Tolmachev",
+    "Anton Voskobovich"
 ]
 
 class Indicator:
