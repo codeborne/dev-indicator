@@ -32,7 +32,6 @@ names = [
     "Kätlin Hein",
     "Maksim Säkki",
     "Marek Kusmin",
-    "Martin Beldman",
     "Nikita Abramenkov",
     "Patrick Abner",
     "Raigo Ukkivi",
