@@ -39,9 +39,7 @@ names = [
     "Sven Eller",
     "Tanel Tamm",
     "Tarmo Ojala",
-    "Vadim Gerassimov",
-    "Andrey Tolmachev",
-    "Anton Voskobovich"
+    "Vadim Gerassimov"
 ]
 
 class Indicator:
