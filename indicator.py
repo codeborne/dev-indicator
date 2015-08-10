@@ -39,6 +39,7 @@ names = [
     "Sven Eller",
     "Tanel Tamm",
     "Tarmo Ojala",
+    "Tõnis Aruste",
     "Vadim Gerassimov"
 ]
 
