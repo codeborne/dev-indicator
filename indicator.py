@@ -13,34 +13,34 @@ from gtk._gtk import CheckMenuItem, SeparatorMenuItem
 from jenkins_desktop_notify import JenkinsChecker, JenkinsNotifier
 from hours import HoursReporter
 
-names = [
-    "Aho Augasmägi",
-    "Aivar Naaber",
-    "Andrei Solntsev",
-    "Annika Tammik",
-    "Anton Keks",
-    "Dmitri Ess",
-    "Dmitri Troškov",
-    "Elina Matvejeva",
-    "Erik Jõgi",
-    "Erkki Teedla",
-    "Jaan Sepp",
-    "Jarmo Pertman",
-    "Kirill Klenski",
-    "Kunnar Klauks",
-    "Kristjan Kokk",
-    "Kätlin Hein",
-    "Maksim Säkki",
-    "Marek Kusmin",
-    "Nikita Abramenkov",
-    "Patrick Abner",
-    "Raigo Ukkivi",
-    "Revo Sirel",
-    "Sven Eller",
-    "Tanel Tamm",
-    "Tarmo Ojala",
-    "Vadim Gerassimov"
-]
+devs = {
+    "Aho Augasmägi":     "aho@codeborne.com",
+    "Aivar Naaber":      "aivar@codeborne.com",
+    "Andrei Solntsev":   "andrei@codeborne.com",
+    "Annika Tammik":     "annika@codeborne.com",
+    "Anton Keks":        "anton@codeborne.com",
+    "Dmitri Ess":        "dmitri.ess@codeborne.com",
+    "Dmitri Troškov":    "dmitri.troskov@codeborne.com",
+    "Elina Matvejeva":   "elina@codeborne.com",
+    "Erik Jõgi":         "erik@codeborne.com",
+    "Erkki Teedla":      "erkki@codeborne.com",
+    "Jaan Sepp":         "jaan@codeborne.com",
+    "Jarmo Pertman":     "jarmo@codeborne.com",
+    "Kirill Klenski":    "kirill@codeborne.com",
+    "Kunnar Klauks":     "kunnar@codeborne.com",
+    "Kristjan Kokk":     "kristjan@codeborne.com",
+    "Kätlin Hein":       "katlin@codeborne.com",
+    "Maksim Säkki":      "maksim@codeborne.com",
+    "Marek Kusmin":      "marek@codeborne.com",
+    "Nikita Abramenkov": "nikita@codeborne.com",
+    "Patrick Abner":     "patrick@codeborne.com",
+    "Raigo Ukkivi":      "raigo@codeborne.com",
+    "Revo Sirel":        "revo@codeborne.com",
+    "Sven Eller":        "sven@codeborne.com",
+    "Tanel Tamm":        "tanel@codeborne.com",
+    "Tarmo Ojala":       "tarmo@codeborne.com",
+    "Vadim Gerassimov":  "vadim@codeborne.com"
+}
 
 class Indicator:
     selected_names = []
@@ -77,7 +77,7 @@ class Indicator:
         else:
             self.add(name)
 
-        self.selected_emails = [re.sub(r" .*$", "@codeborne.com", name.lower()) for name in self.selected_names]
+        self.selected_emails = [devs[name] for name in self.selected_names]
 
         git_username = ", ".join(self.selected_names)
         git_email = ", ".join(self.selected_emails)
@@ -115,7 +115,7 @@ class Indicator:
 
         menu = gtk.Menu()
 
-        for name in names: self._add_name_item(menu, name)
+        for name in sorted(devs): self._add_name_item(menu, name)
 
         separator = SeparatorMenuItem()
         menu.append(separator)
