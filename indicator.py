@@ -39,7 +39,7 @@ devs = {
     "Sven Eller":        "sven@codeborne.com",
     "Tanel Tamm":        "tanel@codeborne.com",
     "Tarmo Ojala":       "tarmo@codeborne.com",
-    "Tõnis Aruste",      "tonis@codeborne.com",
+    "Tõnis Aruste":      "tonis@codeborne.com",
     "Vadim Gerassimov":  "vadim@codeborne.com"
 }
 
