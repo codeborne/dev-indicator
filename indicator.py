@@ -162,7 +162,7 @@ class AutoUpdate(Thread):
     def _check_for_updates(self):
         print "Downloading updates..."
         wget = Popen(["wget", "-qO-", "https://stash.codeborne.com/devindicator/devindicator.tar.gz"], cwd=os.path.dirname(os.path.realpath(__file__)), stdout=PIPE)
-        unpack = Popen(["tar", "xzf", "-"], cwd=os.path.dirname(os.path.realpath(__file__)), stdin=wget).communicate();
+        unpack = Popen(["tar", "xzf", "-"], cwd=os.path.dirname(os.path.realpath(__file__)), stdin=wget.stdout).communicate();
 
         if unpack.returncode == 0:
             print 'Downloading complete'
