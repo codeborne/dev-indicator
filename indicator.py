@@ -4,6 +4,7 @@ from datetime import datetime
 import os
 import re
 from subprocess import Popen, PIPE, STDOUT
+import subprocess
 
 import gtk
 import appindicator
@@ -162,11 +163,8 @@ class AutoUpdate(Thread):
     def _check_for_updates(self):
         print "Downloading updates..."
         wget = Popen(["wget", "-qO-", "https://stash.codeborne.com/devindicator/devindicator.tar.gz"], cwd=os.path.dirname(os.path.realpath(__file__)), stdout=PIPE)
-        unpack = Popen(["tar", "xzf", "-"], cwd=os.path.dirname(os.path.realpath(__file__)), stdin=wget.stdout).communicate();
-
-        if unpack[0].returncode == 0:
-            print 'Downloading complete'
-            self.indicator.restart()
+        subprocess.check_call(["tar", "xzf", "-"], stdin=wget.stdout);
+        self.indicator.restart()
 
     def run(self):
         while True:
