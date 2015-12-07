@@ -160,15 +160,13 @@ class AutoUpdate(Thread):
         self.indicator = indicator
 
     def _check_for_updates(self):
-        print "Check for updates..."
-        updates = Popen(["git", "pull"], cwd=os.path.dirname(os.path.realpath(__file__)), stdout=PIPE, stderr=STDOUT).communicate()[0]
+        print "Downloading updates..."
+        wget = Popen(["wget", "-qO-", "https://stash.codeborne.com/devindicator/devindicator.tar.gz"], cwd=os.path.dirname(os.path.realpath(__file__)), stdout=PIPE)
+        unpack = Popen(["tar", "xzf", "-"], cwd=os.path.dirname(os.path.realpath(__file__)), stdin=wget).communicate();
 
-        if updates:
-            if 'Aborting' in updates:
-                raise Exception(updates)
-            elif 'Already up-to-date' not in updates:
-                print 'Updates found: %s' % updates
-                self.indicator.restart()
+        if unpack.returncode == 0:
+            print 'Downloading complete'
+            self.indicator.restart()
 
     def run(self):
         while True:
