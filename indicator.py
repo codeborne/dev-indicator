@@ -184,7 +184,7 @@ if __name__ == "__main__":
     AutoUpdate(indicator).start()
     UserReset(indicator).start()
     HoursReporter(indicator).start()
-    JenkinsNotifier(JenkinsChecker()).start()
+#    JenkinsNotifier(JenkinsChecker()).start()
 
     gtk.threads_init()
     gtk.threads_enter()
