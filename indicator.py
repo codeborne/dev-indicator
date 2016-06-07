@@ -36,6 +36,7 @@ devs = {
     "Nikita Abramenkov": "nikita@codeborne.com",
     "Patrick Abner":     "patrick@codeborne.com",
     "Raigo Ukkivi":      "raigo@codeborne.com",
+    "Ranno Maripuu":     "ranno@codeborne.com",
     "Revo Sirel":        "revo@codeborne.com",
     "Sven Eller":        "sven@codeborne.com",
     "Tanel Tamm":        "tanel@codeborne.com",
