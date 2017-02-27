@@ -33,15 +33,16 @@ devs = {
     "Kätlin Hein":       "katlin@codeborne.com",
     "Maksim Säkki":      "maksim@codeborne.com",
     "Marek Kusmin":      "marek@codeborne.com",
+    "Mihkel Lukats":     "mihkel@codeborne.com",
     "Nikita Abramenkov": "nikita@codeborne.com",
     "Patrick Abner":     "patrick@codeborne.com",
-    "Raigo Ukkivi":      "raigo@codeborne.com",
+    "Ranno Maripuu":     "ranno@codeborne.com",
     "Revo Sirel":        "revo@codeborne.com",
     "Sven Eller":        "sven@codeborne.com",
+    "Tanel Teinemaa":    "tanel.teinemaa@codeborne.com",
     "Tanel Tamm":        "tanel@codeborne.com",
     "Tarmo Ojala":       "tarmo@codeborne.com",
-    "Tõnis Aruste":      "tonis@codeborne.com",
-    "Vadim Gerassimov":  "vadim@codeborne.com"
+    "Tõnis Aruste":      "tonis@codeborne.com"
 }
 
 class Indicator:
@@ -183,7 +184,7 @@ if __name__ == "__main__":
     AutoUpdate(indicator).start()
     UserReset(indicator).start()
     HoursReporter(indicator).start()
-    JenkinsNotifier(JenkinsChecker()).start()
+#    JenkinsNotifier(JenkinsChecker()).start()
 
     gtk.threads_init()
     gtk.threads_enter()
