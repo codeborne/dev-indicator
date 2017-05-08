@@ -28,6 +28,7 @@ devs = {
     "Jarmo Pertman":     "jarmo@codeborne.com",
     "Kirill Klenski":    "kirill@codeborne.com",
     "Kunnar Klauks":     "kunnar@codeborne.com",
+    "Konstantin Tenman": "konstantin@codeborne.com",
     "Kristjan Kokk":     "kristjan@codeborne.com",
     "Kristo Kuiv":       "kristo@codeborne.com",
     "Kätlin Hein":       "katlin@codeborne.com",
