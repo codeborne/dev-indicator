@@ -4,6 +4,7 @@ from datetime import datetime
 import os
 import re
 from subprocess import Popen, PIPE, STDOUT
+import subprocess
 
 import gtk
 import appindicator
@@ -17,7 +18,6 @@ devs = {
     "Aho Augasmägi":     "aho@codeborne.com",
     "Aivar Naaber":      "aivar@codeborne.com",
     "Andrei Solntsev":   "andrei@codeborne.com",
-    "Annika Tammik":     "annika@codeborne.com",
     "Anton Keks":        "anton@codeborne.com",
     "Dmitri Ess":        "dmitri.ess@codeborne.com",
     "Dmitri Troškov":    "dmitri.troskov@codeborne.com",
@@ -28,19 +28,23 @@ devs = {
     "Jarmo Pertman":     "jarmo@codeborne.com",
     "Kirill Klenski":    "kirill@codeborne.com",
     "Kunnar Klauks":     "kunnar@codeborne.com",
+    "Konstantin Tenman": "konstantin@codeborne.com",
     "Kristjan Kokk":     "kristjan@codeborne.com",
+    "Kristo Kuiv":       "kristo@codeborne.com",
     "Kätlin Hein":       "katlin@codeborne.com",
     "Maksim Säkki":      "maksim@codeborne.com",
     "Marek Kusmin":      "marek@codeborne.com",
+    "Mihkel Lukats":     "mihkel@codeborne.com",
     "Nikita Abramenkov": "nikita@codeborne.com",
     "Patrick Abner":     "patrick@codeborne.com",
-    "Raigo Ukkivi":      "raigo@codeborne.com",
+    "Ranno Maripuu":     "ranno@codeborne.com",
     "Revo Sirel":        "revo@codeborne.com",
     "Sven Eller":        "sven@codeborne.com",
+    "Tanel Teinemaa":    "tanel.teinemaa@codeborne.com",
     "Tanel Tamm":        "tanel@codeborne.com",
     "Tarmo Ojala":       "tarmo@codeborne.com",
     "Tõnis Aruste":      "tonis@codeborne.com",
-    "Vadim Gerassimov":  "vadim@codeborne.com"
+    "Evgeny Davydov":	 "e.davydov@lipt-soft.ru"
 }
 
 class Indicator:
@@ -160,15 +164,11 @@ class AutoUpdate(Thread):
         self.indicator = indicator
 
     def _check_for_updates(self):
-        print "Check for updates..."
-        updates = Popen(["git", "pull"], cwd=os.path.dirname(os.path.realpath(__file__)), stdout=PIPE, stderr=STDOUT).communicate()[0]
-
-        if updates:
-            if 'Aborting' in updates:
-                raise Exception(updates)
-            elif 'Already up-to-date' not in updates:
-                print 'Updates found: %s' % updates
-                self.indicator.restart()
+        if subprocess.call("echo `wget -qO- stash.codeborne.com/devindicator/version` | diff version -", shell=True):
+            print "Downloading updates..."
+            wget = Popen(["wget", "-qO-", "https://stash.codeborne.com/devindicator/devindicator.tar.gz"], cwd=os.path.dirname(os.path.realpath(__file__)), stdout=PIPE)
+            subprocess.check_call(["tar", "xzf", "-", "--directory", os.path.dirname(os.path.realpath(__file__))], stdin=wget.stdout);
+            self.indicator.restart()
 
     def run(self):
         while True:
@@ -186,7 +186,7 @@ if __name__ == "__main__":
     AutoUpdate(indicator).start()
     UserReset(indicator).start()
     HoursReporter(indicator).start()
-    JenkinsNotifier(JenkinsChecker()).start()
+#    JenkinsNotifier(JenkinsChecker()).start()
 
     gtk.threads_init()
     gtk.threads_enter()
