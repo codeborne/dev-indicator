@@ -44,7 +44,8 @@ devs = {
     "Tanel Tamm":        "tanel@codeborne.com",
     "Tarmo Ojala":       "tarmo@codeborne.com",
     "Tõnis Aruste":      "tonis@codeborne.com",
-    "Evgeny Davydov":	 "e.davydov@lipt-soft.ru"
+    "Evgeny Davydov":	 "e.davydov@lipt-soft.ru",
+    "Ülar Kösta":	 "ular@codeborne.com"
 }
 
 class Indicator:
