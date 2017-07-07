@@ -8,3 +8,6 @@ developers sharing the same machine and writing code together.
 
 After midnight, the indicator resets git comitters, so that you won't forget
 to set new names in the morning when you switch pairs.
+
+Specify names and emails of your team's developers in `developers.txt`, then
+run `./indicator.sh`. Or add `indicator.sh` to Startup Applications.
