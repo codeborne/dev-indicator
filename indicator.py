@@ -29,7 +29,7 @@ class Indicator:
 
     def __init__(self):
         current_git_username = Popen(["git", "config", "--global", "user.name"], stdout=PIPE).communicate()[0].strip()
-        self.selected_names = filter(None, [name.strip() for name in current_git_username.split(",")])
+        self.selected_names = filter(lambda name: name in devs, [name.strip() for name in current_git_username.split(",")])
         self.menu = self.build_menu(current_git_username)
 
     def is_selected(self, name):
