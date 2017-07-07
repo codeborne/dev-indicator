@@ -1,5 +1,5 @@
-Dev Indicator
-=============
+Git Committers Indicator
+========================
 
 This is a panel indicator for Linux/Ubuntu that aids pair programming with Git.
 
