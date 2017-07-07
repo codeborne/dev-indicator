@@ -14,39 +14,11 @@ from gtk._gtk import CheckMenuItem, SeparatorMenuItem
 from jenkins_desktop_notify import JenkinsChecker, JenkinsNotifier
 from hours import HoursReporter
 
-devs = {
-    "Aho Augasmägi":     "aho@codeborne.com",
-    "Aivar Naaber":      "aivar@codeborne.com",
-    "Andrei Solntsev":   "andrei@codeborne.com",
-    "Anton Keks":        "anton@codeborne.com",
-    "Dmitri Ess":        "dmitri.ess@codeborne.com",
-    "Dmitri Troškov":    "dmitri.troskov@codeborne.com",
-    "Elina Matvejeva":   "elina@codeborne.com",
-    "Erik Jõgi":         "erik@codeborne.com",
-    "Erkki Teedla":      "erkki@codeborne.com",
-    "Jaan Sepp":         "jaan@codeborne.com",
-    "Jarmo Pertman":     "jarmo@codeborne.com",
-    "Kirill Klenski":    "kirill@codeborne.com",
-    "Kunnar Klauks":     "kunnar@codeborne.com",
-    "Konstantin Tenman": "konstantin@codeborne.com",
-    "Kristjan Kokk":     "kristjan@codeborne.com",
-    "Kristo Kuiv":       "kristo@codeborne.com",
-    "Kätlin Hein":       "katlin@codeborne.com",
-    "Maksim Säkki":      "maksim@codeborne.com",
-    "Marek Kusmin":      "marek@codeborne.com",
-    "Mihkel Lukats":     "mihkel@codeborne.com",
-    "Nikita Abramenkov": "nikita@codeborne.com",
-    "Patrick Abner":     "patrick@codeborne.com",
-    "Ranno Maripuu":     "ranno@codeborne.com",
-    "Revo Sirel":        "revo@codeborne.com",
-    "Sven Eller":        "sven@codeborne.com",
-    "Tanel Teinemaa":    "tanel.teinemaa@codeborne.com",
-    "Tanel Tamm":        "tanel@codeborne.com",
-    "Tarmo Ojala":       "tarmo@codeborne.com",
-    "Tõnis Aruste":      "tonis@codeborne.com",
-    "Evgeny Davydov":	 "e.davydov@lipt-soft.ru",
-    "Ülar Kösta":	 "ular@codeborne.com"
-}
+devs = {}
+with open("developers.txt") as f:
+    for line in f:
+        name, email = line.partition(":")[::2]
+        devs[name.strip()] = email.strip()
 
 class Indicator:
     selected_names = []
