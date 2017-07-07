@@ -134,10 +134,7 @@ class UserReset(Thread):
 if __name__ == "__main__":
     indicator = Indicator()
 
-    AutoUpdate(indicator).start()
     UserReset(indicator).start()
-    HoursReporter(indicator).start()
-#    JenkinsNotifier(JenkinsChecker()).start()
 
     gtk.threads_init()
     gtk.threads_enter()
