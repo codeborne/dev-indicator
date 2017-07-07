@@ -1,4 +1,4 @@
-Developer 1:        dev1@example.com
-Developer 2:        dev2@example.com
-Developer 3:        dev3@example.com
-Developer 4:        dev4@example.com
+Anton Kex:       dev1@example.com
+John Doe:        dev2@example.com
+Tanel Õigeäär:   dev3@example.com
+Иван Попов:      dev4@example.com
