@@ -4,15 +4,15 @@ from datetime import datetime
 import os
 import re
 from subprocess import Popen, PIPE, STDOUT
-
 import gtk
 import appindicator
 from threading import Thread
 import time
 from gtk._gtk import CheckMenuItem, SeparatorMenuItem
-from jenkins_desktop_notify import JenkinsChecker, JenkinsNotifier
+
 from autoupdate import AutoUpdate
-from hours import HoursReporter
+from extras.jenkins_desktop_notify import JenkinsChecker, JenkinsNotifier
+from extras.hours import HoursReporter
 
 class Indicator:
     devs = {}

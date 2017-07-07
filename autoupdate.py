@@ -1,3 +1,4 @@
+import os
 import time
 from threading import Thread
 import subprocess
@@ -17,6 +18,8 @@ class AutoUpdate(Thread):
             self.indicator.restart()
 
     def run(self):
+        if (os.path.exists(".git")):
+            return
         while True:
             try:
                 self._check_for_updates()
@@ -24,5 +27,3 @@ class AutoUpdate(Thread):
             except Exception as e:
                 print 'Failed to update: %s' % e
                 time.sleep(60*60)
-
-
