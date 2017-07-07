@@ -14,13 +14,8 @@ from jenkins_desktop_notify import JenkinsChecker, JenkinsNotifier
 from autoupdate import AutoUpdate
 from hours import HoursReporter
 
-devs = {}
-with open("developers.txt") as f:
-    for line in f:
-        name, email = line.partition(":")[::2]
-        devs[name.strip()] = email.strip()
-
 class Indicator:
+    devs = {}
     selected_names = []
     selected_emails = []
     select_time = None
@@ -28,9 +23,16 @@ class Indicator:
     menu = None
 
     def __init__(self):
+	self.load_devs()
         current_git_username = Popen(["git", "config", "--global", "user.name"], stdout=PIPE).communicate()[0].strip()
-        self.selected_names = filter(lambda name: name in devs, [name.strip() for name in current_git_username.split(",")])
+        self.selected_names = filter(lambda name: name in self.devs, [name.strip() for name in current_git_username.split(",")])
         self.menu = self.build_menu(current_git_username)
+
+    def load_devs(self):
+	with open("developers.txt") as f:
+	    for line in f:
+		name, email = line.partition(":")[::2]
+		self.devs[name.strip()] = email.strip()
 
     def is_selected(self, name):
         return name in self.selected_names
@@ -55,7 +57,7 @@ class Indicator:
         else:
             self.add(name)
 
-        self.selected_emails = [devs[name] for name in self.selected_names]
+        self.selected_emails = [self.devs[name] for name in self.selected_names]
 
         git_username = ", ".join(self.selected_names)
         git_email = ", ".join(self.selected_emails)
@@ -93,7 +95,7 @@ class Indicator:
 
         menu = gtk.Menu()
 
-        for name in sorted(devs): self._add_name_item(menu, name)
+        for name in sorted(self.devs): self._add_name_item(menu, name)
 
         separator = SeparatorMenuItem()
         menu.append(separator)
