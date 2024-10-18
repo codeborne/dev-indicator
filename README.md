@@ -13,3 +13,10 @@ to set new names in the morning when you switch pairs.
 
 Specify names and emails of your team's developers in `developers.txt`, then
 run `./indicator.sh`. Or add `indicator.sh` to Startup Applications.
+
+Installation
+========================
+
+```
+sudo apt install python3-gi libayatana-appindicator3-1 libayatana-appindicator3-dev gir1.2-ayatanaappindicator3-0.1
+```
